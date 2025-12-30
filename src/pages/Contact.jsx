@@ -1,46 +1,101 @@
-import React from 'react';
-import { Phone, Mail, Clock, MapPin, Send } from 'lucide-react';
+import React, { useState } from 'react';
+import { Phone, Mail, Clock, MapPin, Send, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom'; // <--- Import Link
+import { Link } from 'react-router-dom';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; 
+import { db } from '../firebase'; // Ensure you have your firebase config here
+import emailjs from '@emailjs/browser';
 import picture from '../assets/pattern.png';
 
 const Contact = () => {
+  // 1. State for Form Data
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    service: 'Select Service',
+    message: ''
+  });
+
+  // 2. State for Submission Status
+  const [status, setStatus] = useState('idle'); // 'idle', 'loading', 'success', 'error'
+
+  // 3. Handle Input Changes
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // 4. Handle Form Submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Basic Validation
+    if(!formData.name || !formData.email || !formData.message) {
+        alert("Please fill in all required fields.");
+        return;
+    }
+
+    setStatus('loading');
+
+    try {
+      // A. Save to Firebase Firestore (Database)
+      await addDoc(collection(db, "contact_messages"), {
+        ...formData,
+        timestamp: serverTimestamp(),
+        read: false // You can use this later for an admin dashboard
+      });
+
+      // B. Send Email Notification via EmailJS
+      // REPLACE with your actual keys
+      const serviceID = "service_nhwsclu"; 
+      const templateID = "template_61eywtf"; 
+      const publicKey = "ctUKvg88_0Th5sfKn";
+
+      const templateParams = {
+        user_name: formData.name,
+        user_email: formData.email,
+        user_phone: formData.phone,
+        service_type: formData.service,
+        message: formData.message
+      };
+
+      await emailjs.send(serviceID, templateID, templateParams, publicKey);
+
+      // C. Success State
+      setStatus('success');
+      setFormData({ name: '', email: '', phone: '', service: 'Select Service', message: '' });
+
+      // Reset success message after 5 seconds
+      setTimeout(() => setStatus('idle'), 5000);
+
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setStatus('error');
+    }
+  };
+
   return (
     <div className="pt-20">
       
-      {/* 1. Header Section - Image with Overlay */}
-            <section className="relative py-24 text-center text-white overflow-hidden">
-              
-              {/* Background Image Layer */}
-              <div className="absolute inset-0 z-0">
-                {/* You can change this image URL to a specific one for each page if you want */}
-                <img 
-                  src={picture}
-                  alt="Background" 
-                  className="w-full h-full object-cover"
-                />
-                {/* Dark Overlay (85% Opacity) - This makes it "dull" and readable */}
-                <div className="absolute inset-0 bg-brand-charcoal/55"></div>
-              </div>
-      
-              {/* Content Layer */}
-              <div className="relative z-10 max-w-4xl mx-auto px-4">
-                <h1 className="text-4xl md:text-5xl font-bold mb-4 font-creative">
-                  {/* CHANGE THIS TITLE PER PAGE */}
-                  Contact Us
-                </h1>
-                <div className="flex justify-center gap-2 text-gray-300 text-sm font-medium">
-                  <Link to="/" className="hover:text-white transition-colors">Home</Link> / 
-                  {/* CHANGE THIS BREADCRUMB PER PAGE */}
-                  <span className="text-brand-rose">Contact Us</span>
-                </div>
-              </div>
-            </section>
+      {/* 1. Header Section */}
+      <section className="relative py-24 text-center text-white overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img src={picture} alt="Background" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-brand-charcoal/55"></div>
+        </div>
+        <div className="relative z-10 max-w-4xl mx-auto px-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 font-creative">Contact Us</h1>
+          <div className="flex justify-center gap-2 text-gray-300 text-sm font-medium">
+            <Link to="/" className="hover:text-white transition-colors">Home</Link> / 
+            <span className="text-brand-rose">Contact Us</span>
+          </div>
+        </div>
+      </section>
 
       <div className="max-w-7xl mx-auto px-4 py-20">
         <div className="grid lg:grid-cols-3 gap-10">
           
-          {/* 2. Contact Info Card - Dark Blue Theme */}
+          {/* 2. Contact Info Card */}
           <motion.div 
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -58,32 +113,23 @@ const Contact = () => {
                   { icon: <Mail size={24}/>, label: "Email", text: "hello@nexoracreatives.co.ke" },
                   { icon: <Clock size={24}/>, label: "Open Time", text: "Mon - Sat: 07:00 - 19:00" }
                 ].map((item, idx) => (
-                  <motion.div 
-                    key={idx}
-                    whileHover={{ x: 10 }}
-                    className="flex items-start gap-4 group cursor-default"
-                  >
+                  <div key={idx} className="flex items-start gap-4 group cursor-default">
                     <div className="text-brand-rose group-hover:scale-110 transition-transform">{item.icon}</div>
                     <div>
                       <span className="font-bold text-gray-400 text-sm uppercase tracking-wider">{item.label}</span>
                       <p className="text-white font-medium text-lg">{item.text}</p>
                     </div>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
             
-            {/* Decorative Background Circles */}
+            {/* Decorations */}
             <div className="absolute top-0 right-0 w-40 h-40 bg-brand-rose rounded-full blur-3xl opacity-20 -mr-10 -mt-10"></div>
             <div className="absolute bottom-0 left-0 w-40 h-40 bg-brand-rose rounded-full blur-3xl opacity-20 -ml-10 -mb-10"></div>
-            
-            {/* Abstract Pattern */}
-            <svg className="absolute bottom-0 right-0 opacity-10 w-48 h-48 text-white" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-              <path fill="currentColor" d="M45,-76C58.9,-69.3,71.4,-59.1,81.3,-46.7C91.2,-34.3,98.5,-19.7,97.7,-5.3C96.9,9.1,88,23.3,77.5,35.1C67,46.9,54.9,56.3,42.1,64.3C29.3,72.3,15.8,78.9,1.6,76.1C-12.6,73.3,-27.5,61.1,-41.4,51.1C-55.3,41.1,-68.2,33.3,-75.6,21.8C-83,10.3,-84.9,-4.9,-80.6,-18.4C-76.3,-31.9,-65.8,-43.7,-53.8,-51.1C-41.8,-58.5,-28.3,-61.5,-15.8,-63.3C-3.3,-65.1,8.3,-65.7,21,-66" transform="translate(100 100)" />
-            </svg>
           </motion.div>
 
-          {/* 3. Contact Form - White Theme */}
+          {/* 3. Contact Form */}
           <motion.div 
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
@@ -93,41 +139,104 @@ const Contact = () => {
             <h2 className="text-3xl font-bold text-brand-charcoal mb-2">Get Your <span className="text-brand-rose">Free Quote</span> Today</h2>
             <p className="text-gray-500 mb-10">Fill out the form below and we will get back to you shortly.</p>
             
-            <form className="grid md:grid-cols-2 gap-6">
-              {['Your Name *', 'Email Address *', 'Phone Number *'].map((placeholder, idx) => (
-                <motion.div key={idx} whileFocus={{ scale: 1.02 }}>
+            <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-6">
+                {/* Name Input */}
+                <motion.div whileFocus={{ scale: 1.02 }}>
                    <input 
-                     type={idx === 1 ? "email" : "text"} 
-                     placeholder={placeholder} 
+                     type="text" 
+                     name="name"
+                     value={formData.name}
+                     onChange={handleChange}
+                     placeholder="Your Name *" 
+                     required
                      className="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-rose focus:ring-2 focus:ring-brand-rose/20 transition-all" 
                    />
                 </motion.div>
-              ))}
+
+                {/* Email Input */}
+                <motion.div whileFocus={{ scale: 1.02 }}>
+                   <input 
+                     type="email" 
+                     name="email"
+                     value={formData.email}
+                     onChange={handleChange}
+                     placeholder="Email Address *" 
+                     required
+                     className="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-rose focus:ring-2 focus:ring-brand-rose/20 transition-all" 
+                   />
+                </motion.div>
+
+                {/* Phone Input */}
+                <motion.div whileFocus={{ scale: 1.02 }}>
+                   <input 
+                     type="tel" 
+                     name="phone"
+                     value={formData.phone}
+                     onChange={handleChange}
+                     placeholder="Phone Number *" 
+                     required
+                     className="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-rose focus:ring-2 focus:ring-brand-rose/20 transition-all" 
+                   />
+                </motion.div>
               
-              <motion.div whileFocus={{ scale: 1.02 }}>
-                <select className="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-rose focus:ring-2 focus:ring-brand-rose/20 transition-all text-gray-500">
-                  <option>Select Service</option>
-                  <option>Web Development</option>
-                  <option>Mobile App</option>
-                  <option>UI/UX Design</option>
-                </select>
-              </motion.div>
+                {/* Service Selection */}
+                <motion.div whileFocus={{ scale: 1.02 }}>
+                  <select 
+                    name="service"
+                    value={formData.service}
+                    onChange={handleChange}
+                    className="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-rose focus:ring-2 focus:ring-brand-rose/20 transition-all text-gray-500"
+                  >
+                    <option disabled>Select Service</option>
+                    <option>Web Development</option>
+                    <option>Mobile App</option>
+                    <option>UI/UX Design</option>
+                    <option>Digital Marketing</option>
+                    <option>Other</option>
+                  </select>
+                </motion.div>
               
-              <motion.div className="md:col-span-2" whileFocus={{ scale: 1.01 }}>
-                <textarea 
-                  placeholder="Your Message *" 
-                  rows="4" 
-                  className="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-rose focus:ring-2 focus:ring-brand-rose/20 transition-all"
-                ></textarea>
-              </motion.div>
+                {/* Message Area */}
+                <motion.div className="md:col-span-2" whileFocus={{ scale: 1.01 }}>
+                  <textarea 
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    placeholder="Your Message *" 
+                    rows="4" 
+                    required
+                    className="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-rose focus:ring-2 focus:ring-brand-rose/20 transition-all"
+                  ></textarea>
+                </motion.div>
               
-              <motion.button 
-                whileHover={{ scale: 1.02, backgroundColor: "#03045E" }}
-                whileTap={{ scale: 0.98 }}
-                className="md:col-span-2 bg-brand-rose text-white font-bold py-5 rounded-xl shadow-lg shadow-brand-rose/30 flex items-center justify-center gap-3 transition-colors"
-              >
-                Send Message <Send size={20} />
-              </motion.button>
+                {/* Submit Button */}
+                <div className="md:col-span-2">
+                    <motion.button 
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        disabled={status === 'loading' || status === 'success'}
+                        className={`w-full font-bold py-5 rounded-xl shadow-lg flex items-center justify-center gap-3 transition-colors ${
+                            status === 'success' 
+                            ? 'bg-green-500 text-white cursor-default' 
+                            : status === 'error'
+                            ? 'bg-red-500 text-white'
+                            : 'bg-brand-rose text-white hover:bg-brand-charcoal'
+                        }`}
+                    >
+                        {status === 'loading' ? (
+                            <><Loader2 className="animate-spin" /> Sending...</>
+                        ) : status === 'success' ? (
+                            <><CheckCircle /> Message Sent!</>
+                        ) : status === 'error' ? (
+                            <><AlertCircle /> Failed. Try Again.</>
+                        ) : (
+                            <>Send Message <Send size={20} /></>
+                        )}
+                    </motion.button>
+                    {status === 'success' && (
+                        <p className="text-green-600 text-center mt-3 text-sm">We've received your message and will contact you soon!</p>
+                    )}
+                </div>
             </form>
           </motion.div>
         </div>
@@ -140,9 +249,9 @@ const Contact = () => {
           transition={{ duration: 0.8 }}
           className="mt-20 rounded-3xl overflow-hidden shadow-2xl border border-gray-200 h-[400px] relative bg-gray-100"
         >
-          {/* Placeholder for Map - In a real app, use Google Maps Embed API here */}
+          {/* Placeholder for Map */}
           <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.25623872412!2d36.8148!3d-1.2921!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f10d65f5776d5%3A0xf695781625052945!2sNairobi%2C%20Kenya!5e0!3m2!1sen!2sus!4v1625581234567!5m2!1sen!2sus" 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.171173664724!2d37.0694!3d-1.0493!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f4e5b27c66117%3A0xb652a23075841603!2sThika%2C%20Kenya!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus" 
             width="100%" 
             height="100%" 
             style={{ border: 0 }} 
@@ -151,7 +260,6 @@ const Contact = () => {
             className="grayscale hover:grayscale-0 transition-all duration-700"
           ></iframe>
           
-          {/* Map Pin Overlay */}
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
              <div className="relative">
                 <div className="w-4 h-4 bg-brand-rose rounded-full animate-ping absolute"></div>
