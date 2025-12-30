@@ -26,53 +26,90 @@ const Contact = () => {
   };
 
   // 4. Handle Form Submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    // Basic Validation
-    if(!formData.name || !formData.email || !formData.message) {
-        alert("Please fill in all required fields.");
-        return;
-    }
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    setStatus('loading');
+  if(!formData.name || !formData.email || !formData.message) {
+      alert("Please fill in all required fields.");
+      return;
+  }
 
-    try {
-      // A. Save to Firebase Firestore (Database)
-      await addDoc(collection(db, "contact_messages"), {
-        ...formData,
-        timestamp: serverTimestamp(),
-        read: false // You can use this later for an admin dashboard
-      });
+  setStatus('loading');
 
-      // B. Send Email Notification via EmailJS
-      // REPLACE with your actual keys
-      const serviceID = "service_nhwsclu"; 
-      const templateID = "template_61eywtf"; 
-      const publicKey = "ctUKvg88_0Th5sfKn";
+  try {
+    // 1. Save to Firebase (No change)
+    await addDoc(collection(db, "contact_messages"), {
+      ...formData,
+      timestamp: serverTimestamp(),
+      read: false 
+    });
 
-      const templateParams = {
-        user_name: formData.name,
-        user_email: formData.email,
-        user_phone: formData.phone,
-        service_type: formData.service,
-        message: formData.message
-      };
+    // 2. EmailJS Configuration
+        const serviceID = "service_nhwsclu"; 
+        const templateID = "template_61eywtf"; 
+        const publicKey = "ctUKvg88_0Th5sfKn";
 
-      await emailjs.send(serviceID, templateID, templateParams, publicKey);
+    // --- EMAIL 1: Notification to YOU (Admin) ---
+    const adminMessage = `
+      You have a new inquiry!
+      
+      Name: ${formData.name}
+      Email: ${formData.email}
+      Phone: ${formData.phone}
+      Service: ${formData.service}
+      
+      Message:
+      ${formData.message}
+    `;
 
-      // C. Success State
-      setStatus('success');
-      setFormData({ name: '', email: '', phone: '', service: 'Select Service', message: '' });
+    const adminParams = {
+      to_email: "info@nexoracreatives.co.ke", // Send to your business email
+      from_name: "Nexora Website System",
+      reply_to: formData.email, // So you can reply to the client
+      subject: `New Message from ${formData.name} - ${formData.service}`,
+      message_body: adminMessage
+    };
 
-      // Reset success message after 5 seconds
-      setTimeout(() => setStatus('idle'), 5000);
+    // --- EMAIL 2: Auto-Reply to CLIENT ---
+    const clientMessage = `
+      Hi ${formData.name},
 
-    } catch (error) {
-      console.error("Error sending message:", error);
-      setStatus('error');
-    }
-  };
+      Thank you for contacting Nexora Creative Solutions! 
+
+      We have received your message regarding "${formData.service}" and our team is reviewing it. We usually reply within 24 hours.
+
+      In the meantime, feel free to browse on our website.
+
+      Best Regards,
+      Newton Mwangi
+      CEO, Nexora Creative Solutions
+      www.nexoracreatives.co.ke
+    `;
+
+    const clientParams = {
+      to_email: formData.email, // Send to the client
+      from_name: "Nexora Creative Solutions",
+      reply_to: "info@nexoracreatives.co.ke", // So they can reply to you
+      subject: "We received your message! - Nexora",
+      message_body: clientMessage
+    };
+
+    // 3. Send Both Emails using the SAME Template
+    await Promise.all([
+      emailjs.send(serviceID, templateID, adminParams, publicKey),
+      emailjs.send(serviceID, templateID, clientParams, publicKey)
+    ]);
+
+    // 4. Success State
+    setStatus('success');
+    setFormData({ name: '', email: '', phone: '', service: 'Select Service', message: '' });
+    setTimeout(() => setStatus('idle'), 5000);
+
+  } catch (error) {
+    console.error("Error sending message:", error);
+    setStatus('error');
+  }
+};
 
   return (
     <div className="pt-20">
