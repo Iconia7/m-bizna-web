@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; 
 import { db } from '../firebase'; // Ensure this path is correct
 import emailjs from '@emailjs/browser';
-import Logo from '../assets/NCS_Secondary_Logo.png'; // Ensure you are using the correct logo file
+import Logo from '../assets/NCS_Logo.png'; // Ensure you are using the correct logo file
 import FooterPattern from '../assets/pattern.png';
 
 const Footer = () => {
