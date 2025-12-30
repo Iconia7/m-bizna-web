@@ -1,0 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body {
+  /* Body is White, Default text is the new Brand Rose (Red) */
+  @apply bg-white text-brand-rose;
+}
