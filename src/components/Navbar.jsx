@@ -17,7 +17,7 @@ const Navbar = () => {
             <img 
               src={Logo} 
               alt="Nexora Creative Solutions" 
-              className="h-12 w-auto object-contain" // Adjust h-12 to h-10 or h-14 depending on preference
+              className="h-20 md:h-20 w-auto object-contain py-2" // Adjust h-12 to h-10 or h-14 depending on preference
             />
           </Link>
           

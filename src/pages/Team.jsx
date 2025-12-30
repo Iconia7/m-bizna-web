@@ -3,6 +3,7 @@ import { team } from '../data';
 import { Link } from 'react-router-dom';
 import { Facebook, Twitter, Linkedin, Instagram, Share2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import picture from '../assets/pattern.png';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -12,16 +13,35 @@ const fadeInUp = {
 const Team = () => {
   return (
     <div className="pt-20">
+
+      {/* 1. Header Section - Image with Overlay */}
+            <section className="relative py-24 text-center text-white overflow-hidden">
+              
+              {/* Background Image Layer */}
+              <div className="absolute inset-0 z-0">
+                {/* You can change this image URL to a specific one for each page if you want */}
+                <img 
+                  src={picture}
+                  alt="Background" 
+                  className="w-full h-full object-cover"
+                />
+                {/* Dark Overlay (85% Opacity) - This makes it "dull" and readable */}
+                <div className="absolute inset-0 bg-brand-charcoal/55"></div>
+              </div>
       
-      {/* 1. Header Section */}
-      <section className="bg-brand-charcoal text-white py-20 text-center relative overflow-hidden">
-        <div className="absolute bottom-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-        <h1 className="text-4xl font-bold relative z-10">Our Team</h1>
-        <div className="flex justify-center gap-2 mt-4 text-gray-400 text-sm relative z-10">
-          <Link to="/" className="hover:text-white">Home</Link> / 
-          <span className="text-brand-rose">Our Team</span>
-        </div>
-      </section>
+              {/* Content Layer */}
+              <div className="relative z-10 max-w-4xl mx-auto px-4">
+                <h1 className="text-4xl md:text-5xl font-bold mb-4 font-creative">
+                  {/* CHANGE THIS TITLE PER PAGE */}
+                  Our Team
+                </h1>
+                <div className="flex justify-center gap-2 text-gray-300 text-sm font-medium">
+                  <Link to="/" className="hover:text-white transition-colors">Home</Link> / 
+                  {/* CHANGE THIS BREADCRUMB PER PAGE */}
+                  <span className="text-brand-rose">Our Team</span>
+                </div>
+              </div>
+            </section>
 
       {/* 2. Team Grid */}
       <div className="max-w-7xl mx-auto px-4 py-24">

@@ -1,18 +1,56 @@
 import React from 'react';
 import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
-import { Link } from 'react-router-dom'; // Ideally use Link instead of a href for internal nav
+import { Link } from 'react-router-dom';
+import Logo from '../assets/NCS_Logo.png';
+// 1. Import the background pattern image
+import FooterPattern from '../assets/pattern.png';
 
 const Footer = () => {
   return (
-    <footer className="bg-brand-charcoal text-gray-300 pt-16 pb-8 border-t border-brand-rose">
-      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-        {/* Brand Info */}
+    // 2. Set footer to relative and hide overflow so background doesn't spill out
+    <footer className="relative bg-brand-charcoal text-gray-300 pt-16 pb-8 border-t border-brand-rose overflow-hidden">
+
+      {/* --- Background Layers --- */}
+
+      {/* Layer 1: The Pattern Image */}
+      <div
+        className="absolute inset-0 z-0 opacity-70" // Low opacity for the pattern itself so it's subtle
+        style={{
+          backgroundImage: `url(${FooterPattern})`,
+          backgroundRepeat: 'repeat',
+          backgroundSize: '300px auto', // Adjust this value to make the gears bigger or smaller
+          backgroundPosition: 'center'
+        }}
+      ></div>
+
+      {/* Layer 2: The Dull Dark Overlay */}
+      {/* High opacity (95%) charcoal layer to make the background very dull and ensure text readability */}
+      <div className="absolute inset-0 z-0 bg-brand-charcoal/60"></div>
+
+
+      {/* --- Content --- */}
+
+      {/* 3. Wrap content in relative z-10 to place it ON TOP of background layers */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+
+        {/* 1. Brand Info Column (Logo + Text) */}
         <div>
-          <h2 className="text-2xl font-bold text-white mb-4">Nexora<span className="text-brand-rose">.</span></h2>
-          <p className="text-sm leading-relaxed">Transforming ideas into digital reality with cutting-edge technology and expert solutions.</p>
+          {/* Logo Image */}
+          <Link to="/" className="block mb-6">
+            <img
+              src={Logo}
+              alt="Nexora Creative Solutions"
+              // Note: h-25 is not a standard Tailwind class. If it doesn't work, use h-24 or h-[100px]
+              className="h-25 w-auto object-contain"
+            />
+          </Link>
+
+          <p className="text-sm leading-relaxed mb-4">
+            Transforming ideas into digital reality with cutting-edge technology and expert solutions.
+          </p>
         </div>
-        
-        {/* Quick Links - Added Blogs Here */}
+
+        {/* 2. Quick Links */}
         <div>
           <h3 className="text-white font-semibold mb-4 text-lg">Quick Links</h3>
           <ul className="space-y-2 text-sm">
@@ -26,7 +64,7 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* Contact Info */}
+        {/* 3. Contact Info */}
         <div>
           <h3 className="text-white font-semibold mb-4 text-lg">Contact</h3>
           <ul className="space-y-3 text-sm">
@@ -36,11 +74,11 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* Newsletter */}
+        {/* 4. Newsletter */}
         <div>
           <h3 className="text-white font-semibold mb-4 text-lg">Newsletter</h3>
           <div className="flex flex-col gap-3">
-            <input type="email" placeholder="Email Address" className="bg-gray-800 text-white p-3 rounded-md w-full focus:outline-none focus:ring-1 focus:ring-brand-rose border border-gray-700" />
+            <input type="email" placeholder="Email Address" className="bg-gray-800 text-white p-3 rounded-md w-full focus:outline-none focus:ring-1 focus:ring-brand-rose border border-gray-700 placeholder-gray-500 bg-opacity-50" />
             <button className="bg-brand-rose text-white font-bold py-2 rounded-md hover:bg-white hover:text-brand-rose transition">Subscribe</button>
           </div>
           <div className="flex gap-4 mt-6">
@@ -50,8 +88,10 @@ const Footer = () => {
             <Linkedin size={20} className="hover:text-brand-rose cursor-pointer transition"/>
           </div>
         </div>
+
       </div>
-      <div className="text-center border-t border-gray-800 pt-8 text-sm text-gray-500">
+      {/* Ensure copyright area is also z-10 */}
+      <div className="relative z-10 text-center border-t border-gray-800 pt-8 text-sm text-gray-500">
         &copy; {new Date().getFullYear()} Nexora Creative Solutions. All Rights Reserved.
       </div>
     </footer>

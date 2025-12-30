@@ -3,6 +3,7 @@ import { services } from '../data';
 import { ArrowRight, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import picture from '../assets/pattern.png';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
@@ -28,12 +29,12 @@ const Home = () => {
         {/* Background Image Layer */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&q=80" 
+            src={picture}
             alt="Hero Background" 
             className="w-full h-full object-cover"
           />
           {/* Dark Overlay with Dull Transparency (85% Opacity for better text contrast) */}
-          <div className="absolute inset-0 bg-brand-charcoal/85 backdrop-blur-sm"></div>
+          <div className="absolute inset-0 bg-brand-charcoal/40 backdrop-blur-sm"></div>
         </div>
 
         {/* Animated Blob - Moves behind text but over the dark overlay */}
@@ -105,8 +106,27 @@ const Home = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 bg-brand-charcoal text-white relative z-10">
-        <div className="max-w-7xl mx-auto px-4">
+      <section className="py-20 bg-brand-charcoal text-white relative overflow-hidden">
+        
+        {/* --- Background Layers --- */}
+        
+        {/* Layer 1: Pattern Image */}
+        <div
+          className="absolute inset-0 z-0 opacity-50" // Subtle opacity
+          style={{
+            backgroundImage: `url(${picture})`,
+            backgroundRepeat: 'repeat',
+            backgroundSize: '300px auto', 
+            backgroundPosition: 'center'
+          }}
+        ></div>
+
+        {/* Layer 2: Dull Dark Overlay */}
+        <div className="absolute inset-0 z-0 bg-brand-charcoal/50"></div>
+
+
+        {/* --- Content (Wrapped in relative z-10) --- */}
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
           <motion.div 
             initial="hidden"
             whileInView="visible"
@@ -123,7 +143,7 @@ const Home = () => {
               <motion.div variants={fadeInUp} key={idx} className="flex-1 pt-8 md:pt-0 px-4">
                 <motion.h3 
                   whileHover={{ scale: 1.2, color: "#fff" }}
-                  className="text-5xl font-extrabold text-brand-rose mb-2 cursor-default"
+                  className="text-5xl font-extrabold text-brand-rose mb-2 cursor-default font-creative"
                 >
                   {stat.num}
                 </motion.h3>

@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { projects } from '../data';
 import { CheckCircle, ArrowRight, MapPin, Calendar, User, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
+import picture from '../assets/pattern.png';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -26,12 +27,11 @@ const ProjectDetails = () => {
               <div className="absolute inset-0 z-0">
                 {/* You can change this image URL to a specific one for each page if you want */}
                 <img 
-                  src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80" 
-                  alt="Background" 
+                  src={picture}
                   className="w-full h-full object-cover"
                 />
                 {/* Dark Overlay (85% Opacity) - This makes it "dull" and readable */}
-                <div className="absolute inset-0 bg-brand-charcoal/85"></div>
+                <div className="absolute inset-0 bg-brand-charcoal/55"></div>
               </div>
       
               {/* Content Layer */}

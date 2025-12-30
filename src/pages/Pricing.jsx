@@ -2,6 +2,7 @@ import React from 'react';
 import { pricing } from '../data';
 import { Check } from 'lucide-react';
 import { Link } from 'react-router-dom'; // <--- Import Link for the header
+import picture from '../assets/pattern.png';
 
 const Pricing = () => {
   return (
@@ -14,12 +15,12 @@ const Pricing = () => {
                     <div className="absolute inset-0 z-0">
                       {/* You can change this image URL to a specific one for each page if you want */}
                       <img 
-                        src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80" 
+                        src={picture}
                         alt="Background" 
                         className="w-full h-full object-cover"
                       />
                       {/* Dark Overlay (85% Opacity) - This makes it "dull" and readable */}
-                      <div className="absolute inset-0 bg-brand-charcoal/85"></div>
+                      <div className="absolute inset-0 bg-brand-charcoal/55"></div>
                     </div>
             
                     {/* Content Layer */}

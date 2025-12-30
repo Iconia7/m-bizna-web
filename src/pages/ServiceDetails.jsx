@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { services } from '../data';
 import { CheckCircle, ArrowRight, HelpCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import picture from '../assets/pattern.png';
 
 const ServiceDetails = () => {
   const { id } = useParams();
@@ -21,12 +22,11 @@ const ServiceDetails = () => {
         <div className="absolute inset-0 z-0">
           {/* You can change this image URL to a specific one for each page if you want */}
           <img 
-            src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80" 
-            alt="Background" 
+            src={picture}
             className="w-full h-full object-cover"
           />
           {/* Dark Overlay (85% Opacity) - This makes it "dull" and readable */}
-          <div className="absolute inset-0 bg-brand-charcoal/85"></div>
+          <div className="absolute inset-0 bg-brand-charcoal/55"></div>
         </div>
 
         {/* Content Layer */}
