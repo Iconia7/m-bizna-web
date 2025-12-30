@@ -3,7 +3,7 @@ import { Facebook, Twitter, Linkedin, Instagram, Loader2, CheckCircle } from 'lu
 import { Link } from 'react-router-dom';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; // Import Firestore functions
 import emailjs from '@emailjs/browser'; // Import EmailJS
-import { db } from '../firebase'; // Import your Firebase DB config
+import { db } from '../firebase.js'; // Import your Firebase DB config
 import picture from '../assets/newton.jpeg';
 import Logo from '../assets/NCS_Secondary_Logo.png'; 
 
