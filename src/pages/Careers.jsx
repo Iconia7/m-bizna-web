@@ -2,6 +2,8 @@ import React from 'react';
 import { benefits, jobs } from '../data';
 import { CheckCircle, Briefcase, MapPin, Clock, ArrowRight, Heart, Globe, Coffee, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom'; // <--- Import Link
+import picture from '../assets/pattern.png'; // <--- Import Pattern Image
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -19,14 +21,38 @@ const staggerContainer = {
 const Careers = () => {
   return (
     <div className="pt-20">
+
+      {/* 1. New Header Section */}
+      <section className="relative py-24 text-center text-white overflow-hidden">
+        {/* Background Image Layer */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={picture}
+            alt="Background" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-brand-charcoal/55"></div>
+        </div>
+
+        {/* Content Layer */}
+        <div className="relative z-10 max-w-4xl mx-auto px-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 font-creative">
+            Careers
+          </h1>
+          <div className="flex justify-center gap-2 text-gray-300 text-sm font-medium">
+            <Link to="/" className="hover:text-white transition-colors">Home</Link> / 
+            <span className="text-brand-rose">Careers</span>
+          </div>
+        </div>
+      </section>
       
-      {/* 1. Hero Section */}
+      {/* 2. Hero / Intro Section */}
       <section className="relative py-24 bg-white text-center overflow-hidden">
          {/* Animated Background Elements */}
          <motion.div 
-            animate={{ rotate: 360 }}
-            transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
-            className="absolute -top-20 -left-20 w-80 h-80 border-4 border-dashed border-brand-rose/10 rounded-full"
+           animate={{ rotate: 360 }}
+           transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
+           className="absolute -top-20 -left-20 w-80 h-80 border-4 border-dashed border-brand-rose/10 rounded-full"
          />
          <div className="max-w-4xl mx-auto px-4 relative z-10">
             <motion.div initial="hidden" animate="visible" variants={fadeInUp}>
@@ -51,20 +77,20 @@ const Careers = () => {
          </div>
          {/* Hero Image */}
          <motion.div 
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="mt-16 max-w-6xl mx-auto px-4"
+           initial={{ opacity: 0, y: 50 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ delay: 0.3, duration: 0.8 }}
+           className="mt-16 max-w-6xl mx-auto px-4"
          >
             <img 
-                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80" 
-                alt="Team working" 
-                className="rounded-3xl shadow-2xl w-full h-[400px] object-cover"
+               src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80" 
+               alt="Team working" 
+               className="rounded-3xl shadow-2xl w-full h-[400px] object-cover"
             />
          </motion.div>
       </section>
 
-      {/* 2. Perks & Benefits */}
+      {/* 3. Perks & Benefits */}
       <section className="py-24 bg-brand-charcoal text-white relative overflow-hidden">
          {/* Background pattern */}
          <div className="absolute top-0 right-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
@@ -101,7 +127,7 @@ const Careers = () => {
          </div>
       </section>
 
-      {/* 3. Job Openings */}
+      {/* 4. Job Openings */}
       <section id="openings" className="py-24 bg-gray-50">
         <div className="max-w-5xl mx-auto px-4">
             <div className="text-center mb-16">
@@ -143,7 +169,7 @@ const Careers = () => {
         </div>
       </section>
 
-      {/* 4. Life @ Nexora (Gallery) */}
+      {/* 5. Life @ Nexora (Gallery) */}
       <section className="py-24 bg-white">
           <div className="max-w-7xl mx-auto px-4">
             <div className="flex items-end justify-between mb-12">
@@ -172,7 +198,7 @@ const Careers = () => {
           </div>
       </section>
 
-      {/* 5. Bottom CTA (Reused style) */}
+      {/* 6. Bottom CTA (Reused style) */}
       <section className="py-20 bg-brand-charcoal text-white text-center">
           <div className="max-w-3xl mx-auto px-4">
               <h2 className="text-3xl font-bold mb-6">Don't see a position that fits?</h2>
