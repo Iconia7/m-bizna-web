@@ -70,7 +70,7 @@ const Footer = () => {
           <ul className="space-y-3 text-sm">
             <li className="flex items-center gap-2"><Phone size={16} className="text-brand-rose"/> +254 115 332 870</li>
             <li className="flex items-center gap-2"><Mail size={16} className="text-brand-rose"/> info@nexoracreatives.co.ke</li>
-            <li className="flex items-center gap-2"><MapPin size={16} className="text-brand-rose"/> Nairobi, Kenya</li>
+            <li className="flex items-center gap-2"><MapPin size={16} className="text-brand-rose"/> Thika, Kiambu, Kenya</li>
           </ul>
         </div>
 

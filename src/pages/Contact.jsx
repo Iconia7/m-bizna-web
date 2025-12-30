@@ -53,10 +53,10 @@ const Contact = () => {
               
               <div className="space-y-8">
                 {[
-                  { icon: <MapPin size={24}/>, label: "Address", text: "Valley Rd, Nairobi, Kenya" },
-                  { icon: <Phone size={24}/>, label: "Phone", text: "+254 700 123 456" },
-                  { icon: <Mail size={24}/>, label: "Email", text: "hello@nexora.co.ke" },
-                  { icon: <Clock size={24}/>, label: "Open Time", text: "Mon - Fri: 09:00 - 17:00" }
+                  { icon: <MapPin size={24}/>, label: "Address", text: "Thika, Kiambu, Kenya" },
+                  { icon: <Phone size={24}/>, label: "Phone", text: "+254 115 332 870" },
+                  { icon: <Mail size={24}/>, label: "Email", text: "hello@nexoracreatives.co.ke" },
+                  { icon: <Clock size={24}/>, label: "Open Time", text: "Mon - Sat: 07:00 - 19:00" }
                 ].map((item, idx) => (
                   <motion.div 
                     key={idx}
