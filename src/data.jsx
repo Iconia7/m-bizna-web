@@ -71,9 +71,48 @@ export const projects = [
 ];
 
 export const pricing = [
-  { plan: "Basic", price: "89", period: "/Hour", features: ["Consultation", "Basic UI/UX", "Frontend Dev", "No Support"] },
-  { plan: "Standard", price: "1999", period: "/Month", features: ["Advanced UI/UX", "Full Stack Dev", "SEO Optimization", "1 Month Support"], recommended: true },
-  { plan: "Premium", price: "19,999", period: "/Year", features: ["Enterprise Solutions", "Cloud Hosting", "24/7 Support", "Dedicated Manager"] },
+  {
+    plan: "Starter Package",
+    price: "45,000",
+    period: "Per Project",
+    features: [
+      "Responsive Website (5 Pages)",
+      "Domain & Hosting Setup",
+      "Basic SEO Optimization",
+      "Contact Form Integration",
+      "1 Month Free Support",
+      "Social Media Links"
+    ],
+    recommended: false
+  },
+  {
+    plan: "Business Growth",
+    price: "125,000",
+    period: "Per Project",
+    features: [
+      "Dynamic Website / CMS (Admin Panel)",
+      "E-commerce (Up to 50 Products)",
+      "M-Pesa Payment Integration",
+      "Advanced SEO & Analytics",
+      "Blog/News Section",
+      "3 Months Free Support"
+    ],
+    recommended: true
+  },
+  {
+    plan: "Enterprise & Custom",
+    price: "280,000+",
+    period: "Starting From",
+    features: [
+      "Custom Web or Mobile Application",
+      "Cloud Infrastructure (AWS/Google)",
+      "API Development & Integration",
+      "Unlimited Products/Users",
+      "Automated Backups & Security",
+      "6 Months Priority Support"
+    ],
+    recommended: false
+  }
 ];
 
 export const team = [

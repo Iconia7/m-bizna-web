@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
+import { Facebook, Twitter, Linkedin, Instagram, Loader2, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; // Import Firestore functions
+import emailjs from '@emailjs/browser'; // Import EmailJS
+import { db } from '../firebase'; // Import your Firebase DB config
 import picture from '../assets/newton.jpeg';
-import Logo from '../assets/NCS_Secondary_Logo.png'; // Ensure filename matches exactly
+import Logo from '../assets/NCS_Secondary_Logo.png'; 
 
 const ComingSoon = () => {
+  // 1. Define the missing state variables
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState('idle'); // 'idle', 'loading', 'success', 'error'
+  const [message, setMessage] = useState('');
+
   const [timeLeft, setTimeLeft] = useState({
     days: 5,
     hours: 1,
@@ -36,6 +44,49 @@ const ComingSoon = () => {
     return () => clearInterval(timer);
   }, []);
 
+  const handleSubscribe = async (e) => {
+    e.preventDefault();
+    
+    if (!email || !email.includes('@')) {
+        setMessage('Please enter a valid email.');
+        setStatus('error');
+        return;
+    }
+
+    setStatus('loading');
+    setMessage('');
+
+    try {
+        // 1. Save to Firebase
+        await addDoc(collection(db, "subscribers"), {
+            email: email,
+            timestamp: serverTimestamp(),
+            source: 'Coming Soon Page'
+        });
+
+        // 2. Send Email via EmailJS
+        // REPLACE WITH YOUR ACTUAL KEYS FROM EMAILJS DASHBOARD
+        const serviceID = "service_nhwsclu"; 
+        const templateID = "template_7i8obf5"; 
+        const publicKey = "ctUKvg88_0Th5sfKn";
+
+        const templateParams = {
+            user_email: email, 
+        };
+
+        await emailjs.send(serviceID, templateID, templateParams, publicKey);
+
+        setStatus('success');
+        setEmail('');
+        setMessage('You have been subscribed successfully!');
+        
+    } catch (error) {
+        console.error("Error: ", error);
+        setStatus('error');
+        setMessage('Something went wrong. Please try again.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col md:flex-row font-sans">
       
@@ -59,10 +110,9 @@ const ComingSoon = () => {
       </div>
 
       {/* ---------------- RIGHT SIDE (Content) ---------------- */}
-      {/* Changed to a flex column to organize Logo (top), Content (middle), Copyright (bottom) */}
       <div className="w-full md:w-1/2 flex flex-col bg-white h-auto md:h-screen overflow-y-auto">
          
-         {/* 1. Logo Section (Top) */}
+         {/* 1. Logo Section */}
          <div className="p-8 md:p-5 pb-0">
             <Link to="/">
                 <img 
@@ -73,8 +123,8 @@ const ComingSoon = () => {
             </Link>
          </div>
 
-         {/* 2. Main Content (Middle - Centered) */}
-         <div className="flex-grow flex flex-col justify-center px-8 md:px-10 py-0">
+         {/* 2. Main Content */}
+         <div className="flex-grow flex flex-col justify-center px-8 md:px-10 py-10">
              <div className="max-w-lg w-full mx-auto">
                 <span className="text-brand-rose font-bold uppercase tracking-wider text-sm mb-3 block">
                     // Coming Soon
@@ -103,16 +153,37 @@ const ComingSoon = () => {
                 {/* Subscription Form */}
                 <div className="mb-10">
                     <p className="text-gray-600 mb-4 font-medium">Get notified when site goes live:</p>
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        <input 
-                            type="email" 
-                            placeholder="Enter your email" 
-                            className="w-full px-6 py-4 rounded-full border border-gray-200 focus:outline-none focus:border-brand-rose bg-gray-50 focus:ring-1 focus:ring-brand-rose transition" 
-                        />
-                        <button className="bg-brand-rose text-white px-8 py-4 rounded-full font-bold hover:bg-brand-charcoal transition shadow-lg whitespace-nowrap">
-                            Subscribe
-                        </button>
-                    </div>
+                    
+                    {/* WRAPPED IN FORM TO HANDLE SUBMIT */}
+                    <form onSubmit={handleSubscribe} className="flex flex-col gap-3">
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <input 
+                                type="email" 
+                                placeholder="Enter your email" 
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                disabled={status === 'loading' || status === 'success'}
+                                className="w-full px-6 py-4 rounded-full border border-gray-200 focus:outline-none focus:border-brand-rose bg-gray-50 focus:ring-1 focus:ring-brand-rose transition disabled:opacity-50" 
+                            />
+                            <button 
+                                type="submit"
+                                disabled={status === 'loading' || status === 'success'}
+                                className={`px-8 py-4 rounded-full font-bold transition shadow-lg whitespace-nowrap flex items-center justify-center min-w-[140px] ${
+                                    status === 'success' 
+                                    ? 'bg-green-500 text-white cursor-default' 
+                                    : 'bg-brand-rose text-white hover:bg-brand-charcoal'
+                                }`}
+                            >
+                                {status === 'loading' ? <Loader2 className="animate-spin" /> : status === 'success' ? 'Subscribed!' : 'Subscribe'}
+                            </button>
+                        </div>
+                        {/* Message Feedback Area */}
+                        {message && (
+                            <p className={`text-sm ml-2 ${status === 'error' ? 'text-red-500' : 'text-green-600'}`}>
+                                {message}
+                            </p>
+                        )}
+                    </form>
                 </div>
 
                 {/* Social Icons */}
@@ -126,7 +197,7 @@ const ComingSoon = () => {
              </div>
          </div>
 
-         {/* 3. Footer (Bottom) */}
+         {/* 3. Footer */}
          <div className="p-8 md:p-12 text-gray-400 text-sm md:text-center lg:text-left">
              Copyright © {new Date().getFullYear()} Nexora Creative Solutions.
          </div>

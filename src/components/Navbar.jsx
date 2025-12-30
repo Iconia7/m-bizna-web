@@ -28,9 +28,12 @@ const Navbar = () => {
                 {item}
               </Link>
             ))}
-            <button className="bg-brand-rose px-6 py-2 rounded-full text-white font-medium hover:bg-white hover:text-brand-rose transition">
+            <Link 
+              to="/contact" 
+              className="bg-brand-rose px-6 py-2 rounded-full text-white font-medium hover:bg-white hover:text-brand-rose transition border border-brand-rose"
+            >
               Get A Quote
-            </button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
