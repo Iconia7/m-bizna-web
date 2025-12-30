@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
+import Logo from '../assets/NCS_Secondary_Logo.png';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,9 +11,14 @@ const Navbar = () => {
     <nav className="bg-brand-white text-brand-charcoal fixed w-full z-50 shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
-          {/* Logo */}
-          <Link to="/" className="text-2xl font-bold text-charcoal">
-            Nexora<span className="text-brand-rose">.</span>
+          {/* Logo Section */}
+          <Link to="/" className="flex items-center">
+            {/* 2. Replace text with Image */}
+            <img 
+              src={Logo} 
+              alt="Nexora Creative Solutions" 
+              className="h-12 w-auto object-contain" // Adjust h-12 to h-10 or h-14 depending on preference
+            />
           </Link>
           
           {/* Desktop Links - White text, Rose on Hover */}
