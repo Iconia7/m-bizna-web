@@ -6,6 +6,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase'; // Ensure you have your firebase config here
 import emailjs from '@emailjs/browser';
 import picture from '../assets/pattern.png';
+import { Helmet } from 'react-helmet-async';
 
 const Contact = () => {
   // 1. State for Form Data
@@ -33,6 +34,12 @@ const handleSubmit = async (e) => {
       alert("Please fill in all required fields.");
       return;
   }
+
+    // CHECK CAPTCHA: Ensure window.grecaptcha exists and has a response
+    if (window.grecaptcha && window.grecaptcha.getResponse().length === 0) {
+        alert("Please verify that you are not a robot.");
+        return;
+    }
 
   setStatus('loading');
 
@@ -103,6 +110,7 @@ const handleSubmit = async (e) => {
     // 4. Success State
     setStatus('success');
     setFormData({ name: '', email: '', phone: '', service: 'Select Service', message: '' });
+    if(window.grecaptcha) window.grecaptcha.reset();
     setTimeout(() => setStatus('idle'), 5000);
 
   } catch (error) {
@@ -113,6 +121,10 @@ const handleSubmit = async (e) => {
 
   return (
     <div className="pt-20">
+        <Helmet>
+                <title>Contact Us - Nexora Creative Solutions</title>
+                <meta name="description" content="Nexora Creative Solutions is a leading tech agency in Kenya specializing in Web Development, Mobile Apps, and Digital Marketing." />
+              </Helmet>
       
       {/* 1. Header Section */}
       <section className="relative py-24 text-center text-white overflow-hidden">
@@ -147,7 +159,7 @@ const handleSubmit = async (e) => {
                 {[
                   { icon: <MapPin size={24}/>, label: "Address", text: "Thika, Kiambu, Kenya" },
                   { icon: <Phone size={24}/>, label: "Phone", text: "+254 115 332 870" },
-                  { icon: <Mail size={24}/>, label: "Email", text: "hello@nexoracreatives.co.ke" },
+                  { icon: <Mail size={24}/>, label: "Email", text: "info@nexoracreatives.co.ke" },
                   { icon: <Clock size={24}/>, label: "Open Time", text: "Mon - Sat: 07:00 - 19:00" }
                 ].map((item, idx) => (
                   <div key={idx} className="flex items-start gap-4 group cursor-default">
@@ -177,6 +189,7 @@ const handleSubmit = async (e) => {
             <p className="text-gray-500 mb-10">Fill out the form below and we will get back to you shortly.</p>
             
             <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-6">
+                
                 {/* Name Input */}
                 <motion.div whileFocus={{ scale: 1.02 }}>
                    <input 
@@ -245,6 +258,10 @@ const handleSubmit = async (e) => {
                     className="w-full p-4 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-rose focus:ring-2 focus:ring-brand-rose/20 transition-all"
                   ></textarea>
                 </motion.div>
+
+                <div className="md:col-span-2 flex justify-center mb-4">
+                    <div className="g-recaptcha" data-sitekey="6LfWPTwsAAAAAL7MIvw9G_BLeA7il4BTwNJCu7eN"></div>
+                </div>
               
                 {/* Submit Button */}
                 <div className="md:col-span-2">
@@ -279,31 +296,33 @@ const handleSubmit = async (e) => {
         </div>
 
         {/* 4. Map Section */}
-        <motion.div 
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="mt-20 rounded-3xl overflow-hidden shadow-2xl border border-gray-200 h-[400px] relative bg-gray-100"
-        >
-          {/* Placeholder for Map */}
-          <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.171173664724!2d37.0694!3d-1.0493!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f4e5b27c66117%3A0xb652a23075841603!2sThika%2C%20Kenya!5e0!3m2!1sen!2sus!4v1700000000000!5m2!1sen!2sus" 
-            width="100%" 
-            height="100%" 
-            style={{ border: 0 }} 
-            allowFullScreen="" 
-            loading="lazy"
-            className="grayscale hover:grayscale-0 transition-all duration-700"
-          ></iframe>
-          
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-             <div className="relative">
-                <div className="w-4 h-4 bg-brand-rose rounded-full animate-ping absolute"></div>
-                <div className="w-4 h-4 bg-brand-rose rounded-full border-2 border-white shadow-lg"></div>
-             </div>
-          </div>
-        </motion.div>
+<motion.div 
+  initial={{ opacity: 0, y: 50 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.8 }}
+  className="mt-20 rounded-3xl overflow-hidden shadow-2xl border border-gray-200 h-[400px] relative bg-gray-100"
+>
+  {/* Live Map of Thika */}
+  <iframe 
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127672.27596009852!2d37.00844788358245!3d-1.040711132231267!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f4e5b27c66117%3A0xb6f8a7e126152c26!2sThika!5e0!3m2!1sen!2ske!4v1709210000000!5m2!1sen!2ske"
+    width="100%" 
+    height="100%" 
+    style={{ border: 0 }} 
+    allowFullScreen="" 
+    loading="lazy"
+    referrerPolicy="no-referrer-when-downgrade"
+    className="grayscale hover:grayscale-0 transition-all duration-700"
+  ></iframe>
+  
+  {/* Ping Animation - Keeps it centered on the map */}
+  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+     <div className="relative">
+        <div className="w-4 h-4 bg-brand-rose rounded-full animate-ping absolute"></div>
+        <div className="w-4 h-4 bg-brand-rose rounded-full border-2 border-white shadow-lg"></div>
+     </div>
+  </div>
+</motion.div>
 
       </div>
     </div>

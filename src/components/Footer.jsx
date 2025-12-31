@@ -21,6 +21,12 @@ const Footer = () => {
         return;
     }
 
+    if (window.grecaptcha && window.grecaptcha.getResponse().length === 0) {
+        setMessage("Please verify you are not a robot.");
+        setStatus('error');
+        return;
+    }
+
     setStatus('loading');
     setMessage('');
 
@@ -50,6 +56,7 @@ const Footer = () => {
         setStatus('success');
         setEmail('');
         setMessage('Thanks for subscribing!');
+        if(window.grecaptcha) window.grecaptcha.reset();
         setTimeout(() => { setStatus('idle'); setMessage(''); }, 3000);
 
     } catch (error) {
@@ -128,6 +135,10 @@ const Footer = () => {
                 disabled={status === 'loading' || status === 'success'}
                 className="bg-gray-800 text-white p-3 rounded-md w-full focus:outline-none focus:ring-1 focus:ring-brand-rose border border-gray-700 placeholder-gray-500 bg-opacity-50 disabled:opacity-50" 
             />
+
+            <div className="mb-3 transform scale-75 origin-left"> 
+    <div className="g-recaptcha" data-size="compact" data-sitekey="6LfWPTwsAAAAAL7MIvw9G_BLeA7il4BTwNJCu7eN"></div>
+</div>
             
             <button 
                 type="submit"

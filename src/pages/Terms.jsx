@@ -2,10 +2,15 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle, AlertTriangle, Briefcase, DollarSign } from 'lucide-react';
 import picture from '../assets/pattern.png';
+import { Helmet } from 'react-helmet-async';
 
 const Terms = () => {
   return (
     <div className="pt-20">
+        <Helmet>
+                <title>Terms - Nexora Creative Solutions</title>
+                <meta name="description" content="Nexora Creative Solutions is a leading tech agency in Kenya specializing in Web Development, Mobile Apps, and Digital Marketing." />
+              </Helmet>
       
       {/* Header */}
       <section className="relative py-20 text-center text-white overflow-hidden">

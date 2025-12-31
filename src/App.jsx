@@ -14,13 +14,14 @@ import Blogs from './pages/Blogs';
 import ProjectDetails from './pages/ProjectDetails';
 import ServiceDetails from './pages/ServiceDetails';
 import BlogDetails from './pages/BlogDetails';
-import Team from './pages/Team'; // <--- Import
-import TeamDetails from './pages/TeamDetails'; // <--- Import
-import ComingSoon from './pages/ComingSoon'; // <--- Import
+import Team from './pages/Team'; 
+import TeamDetails from './pages/TeamDetails'; 
+import ComingSoon from './pages/ComingSoon'; 
 import NotFound from './pages/NotFound';
-import PrivacyPolicy from './pages/PrivacyPolicy'; // <--- Import
+import PrivacyPolicy from './pages/PrivacyPolicy'; 
 import Terms from './pages/Terms';
 
+// Scroll to top on route change
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -33,54 +34,56 @@ function App() {
   return (
     <Router>
       <div className="flex flex-col min-h-screen">
-        {/* Conditionally render Navbar/Footer if needed, but keeping them globally is fine usually. 
-            However, ComingSoon usually hides them. We can do a layout check or just let it overlay. 
-            For simplicity here, we keep them, but ComingSoon has 'min-h-screen' and 'z-50' to cover content. */}
         <ConditionalLayout>
            <Routes>
-            {/* --- COMING SOON MODE ACTIVE --- */}
-            
-            {/* 1. Make the root URL show Coming Soon */}
-            <Route path="/" element={<ComingSoon />} />
-            
-            {/* 2. Move the Real Home to a different path so YOU can still test it */}
-            <Route path="/home-preview" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/services/:id" element={<ServiceDetails />} />
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/projects/:id" element={<ProjectDetails />} />
-            <Route path="/blogs" element={<Blogs />} />
-            <Route path="/blogs/:id" element={<BlogDetails />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/careers" element={<Careers />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<Terms />} />
-            
-            {/* New Routes */}
-            <Route path="/team" element={<Team />} />
-            <Route path="/team/:id" element={<TeamDetails />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+             {/* --- LIVE ROUTES --- */}
+             
+             {/* 1. Root is now the Real Home Page */}
+             <Route path="/" element={<Home />} />
+             
+             {/* 2. Main Pages */}
+             <Route path="/about" element={<About />} />
+             <Route path="/services" element={<Services />} />
+             <Route path="/services/:id" element={<ServiceDetails />} />
+             <Route path="/projects" element={<Projects />} />
+             <Route path="/projects/:id" element={<ProjectDetails />} />
+             <Route path="/blogs" element={<Blogs />} />
+             <Route path="/blogs/:id" element={<BlogDetails />} />
+             <Route path="/pricing" element={<Pricing />} />
+             <Route path="/careers" element={<Careers />} />
+             <Route path="/contact" element={<Contact />} />
+             <Route path="/team" element={<Team />} />
+             <Route path="/team/:id" element={<TeamDetails />} />
+
+             {/* 3. Legal */}
+             <Route path="/privacy" element={<PrivacyPolicy />} />
+             <Route path="/terms" element={<Terms />} />
+             
+             {/* 4. Utilities */}
+             {/* Kept this just in case you ever need to switch it back quickly, 
+                 but it's no longer the default */}
+             <Route path="/coming-soon" element={<ComingSoon />} />
+             <Route path="*" element={<NotFound />} />
+           </Routes>
         </ConditionalLayout>
       </div>
     </Router>
   );
 }
 
-// Wrapper to hide Navbar/Footer on Coming Soon page
+// Wrapper to hide Navbar/Footer only on specific utility pages
 const ConditionalLayout = ({ children }) => {
   const location = useLocation();
   
-  // Hide Navbar/Footer on 'Coming Soon', '404', and the root '/' path (while in maintenance mode)
-  const hideLayout = location.pathname === '/coming-soon' || location.pathname === '/'; 
+  // Only hide Navbar/Footer on 'Coming Soon' page now.
+  // The Home page ('/') will now correctly show the Navbar & Footer.
+  const hideLayout = location.pathname === '/coming-soon'; 
 
   return (
     <>
+      <ScrollToTop />
       {!hideLayout && <Navbar />}
-      <main className={`flex-grow ${!hideLayout ? '' : 'w-full'}`}>
-        <ScrollToTop />
+      <main className="flex-grow">
         {children}
       </main>
       {!hideLayout && <Footer />}

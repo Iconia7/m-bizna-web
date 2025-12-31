@@ -7,6 +7,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase'; 
 import emailjs from '@emailjs/browser';
 import picture from '../assets/pattern.png';
+import { Helmet } from 'react-helmet-async';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -28,6 +29,11 @@ const Services = () => {
     e.preventDefault();
     if(!formData.name || !formData.email) {
         alert("Please fill in all fields.");
+        return;
+    }
+
+    if (window.grecaptcha && window.grecaptcha.getResponse().length === 0) {
+        alert("Please verify that you are not a robot.");
         return;
     }
 
@@ -70,6 +76,7 @@ const Services = () => {
 
         setStatus('success');
         setFormData({ name: '', email: '' });
+        if(window.grecaptcha) window.grecaptcha.reset();
         setTimeout(() => setStatus('idle'), 5000);
 
     } catch (error) {
@@ -87,6 +94,10 @@ const Services = () => {
 
   return (
     <div className="pt-20">
+        <Helmet>
+                <title>Services - Nexora Creative Solutions</title>
+                <meta name="description" content="Nexora Creative Solutions is a leading tech agency in Kenya specializing in Web Development, Mobile Apps, and Digital Marketing." />
+              </Helmet>
       
       {/* 1. Header Section */}
       <section className="relative py-24 text-center text-white overflow-hidden">
@@ -210,6 +221,10 @@ const Services = () => {
                        required
                        className="w-full p-4 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-brand-rose transition" 
                    />
+
+                   <div className="md:col-span-2 flex justify-center mb-4">
+                    <div className="g-recaptcha" data-sitekey="6LfWPTwsAAAAAL7MIvw9G_BLeA7il4BTwNJCu7eN"></div>
+                </div>
                    
                    <button 
                        type="submit"

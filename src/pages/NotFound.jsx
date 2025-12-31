@@ -2,10 +2,15 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Home } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 
 const NotFound = () => {
   return (
     <div className="pt-20 min-h-[80vh] flex items-center justify-center bg-white overflow-hidden relative">
+        <Helmet>
+                <title>Not Found - Nexora Creative Solutions</title>
+                <meta name="description" content="Nexora Creative Solutions is a leading tech agency in Kenya specializing in Web Development, Mobile Apps, and Digital Marketing." />
+              </Helmet>
       
       {/* Decorative Sparkles (SVG shapes) */}
       <motion.div 

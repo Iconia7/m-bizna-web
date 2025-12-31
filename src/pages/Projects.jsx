@@ -8,6 +8,7 @@ import { db } from '../firebase';
 import emailjs from '@emailjs/browser';
 import picture from '../assets/pattern.png';
 import newton from '../assets/newton.jpeg';
+import { Helmet } from 'react-helmet-async';
 
 const Projects = () => {
   const [filter, setFilter] = useState('All');
@@ -25,6 +26,11 @@ const Projects = () => {
     e.preventDefault();
     if(!formData.name || !formData.email) {
         alert("Please fill in all fields.");
+        return;
+    }
+
+        if (window.grecaptcha && window.grecaptcha.getResponse().length === 0) {
+        alert("Please verify that you are not a robot.");
         return;
     }
 
@@ -67,6 +73,7 @@ const Projects = () => {
 
         setStatus('success');
         setFormData({ name: '', email: '' });
+         if(window.grecaptcha) window.grecaptcha.reset();
         setTimeout(() => setStatus('idle'), 5000);
 
     } catch (error) {
@@ -112,6 +119,10 @@ const Projects = () => {
 
   return (
     <div className="pt-20">
+        <Helmet>
+                <title>Projects - Nexora Creative Solutions</title>
+                <meta name="description" content="Nexora Creative Solutions is a leading tech agency in Kenya specializing in Web Development, Mobile Apps, and Digital Marketing." />
+              </Helmet>
       
       {/* 1. Header Section */}
       <section className="relative py-24 text-center text-white overflow-hidden">
@@ -243,6 +254,9 @@ const Projects = () => {
                             className="flex-1 px-6 py-4 rounded-full bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-brand-rose focus:bg-white/20 transition"
                         />
                     </div>
+                    <div className="md:col-span-2 flex justify-center mb-4">
+                    <div className="g-recaptcha" data-sitekey="6LfWPTwsAAAAAL7MIvw9G_BLeA7il4BTwNJCu7eN"></div>
+                </div>
                     <button 
                         type="submit"
                         disabled={status === 'loading' || status === 'success'}

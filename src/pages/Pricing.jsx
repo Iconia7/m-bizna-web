@@ -7,6 +7,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase'; 
 import emailjs from '@emailjs/browser';
 import picture from '../assets/pattern.png';
+import { Helmet } from 'react-helmet-async';
 
 const Pricing = () => {
   // --- STATE MANAGEMENT ---
@@ -45,6 +46,12 @@ const Pricing = () => {
     }
     if(paymentMethod === 'mpesa' && !formData.mpesaCode) {
         alert("Please enter the M-Pesa Transaction Code.");
+        return;
+    }
+
+    
+    if (window.grecaptcha && window.grecaptcha.getResponse().length === 0) {
+        alert("Please verify that you are not a robot.");
         return;
     }
 
@@ -115,6 +122,7 @@ const Pricing = () => {
         ]);
 
         setStatus('success');
+        if(window.grecaptcha) window.grecaptcha.reset();
         setTimeout(() => closeModal(), 5000);
 
     } catch (error) {
@@ -125,6 +133,10 @@ const Pricing = () => {
 
   return (
     <div className="pt-20">
+        <Helmet>
+                <title>Pricing - Nexora Creative Solutions</title>
+                <meta name="description" content="Nexora Creative Solutions is a leading tech agency in Kenya specializing in Web Development, Mobile Apps, and Digital Marketing." />
+              </Helmet>
       
       {/* 1. Header Section */}
       <section className="relative py-24 text-center text-white overflow-hidden">
@@ -308,6 +320,10 @@ const Pricing = () => {
                                     </div>
                                 )}
                             </div>
+
+                            <div className="md:col-span-2 flex justify-center mb-4">
+                    <div className="g-recaptcha" data-sitekey="6LfWPTwsAAAAAL7MIvw9G_BLeA7il4BTwNJCu7eN"></div>
+                </div>
 
                             {/* Submit Button */}
                             <button 

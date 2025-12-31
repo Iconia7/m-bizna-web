@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import picture from '../assets/pattern.png';
+import { Helmet } from 'react-helmet-async';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 40 },
@@ -23,6 +24,29 @@ const staggerContainer = {
 const Home = () => {
   return (
     <div className="pt-20 overflow-hidden">
+        <Helmet>
+        {/* 1. The Blue Link Text in Google */}
+        <title>Nexora Creative Solutions | Top Web Design & App Development in Kenya</title>
+        
+        {/* 2. The Grey Description Text below the link */}
+        <meta 
+          name="description" 
+          content="Nexora Creative Solutions is a leading tech agency in Thika & Nairobi. We build custom Mobile Apps (Flutter), Websites (React), and offer Digital Marketing services to grow your business." 
+        />
+        
+        {/* 3. Keywords (Helpful for other search engines) */}
+        <meta name="keywords" content="Web Design Kenya, Mobile App Development Nairobi, SEO Services Thika, M-Pesa Integration, Flutter Developer, React Developer" />
+        
+        {/* 4. Canonical Link (Tells Google this is the 'real' home page) */}
+        <link rel="canonical" href="https://nexoracreatives.co.ke/" />
+
+        {/* 5. Open Graph (For when people share your link on WhatsApp/Facebook/LinkedIn) */}
+        <meta property="og:title" content="Nexora Creative Solutions - Transforming Ideas into Reality" />
+        <meta property="og:description" content="Expert Web & Mobile App Development in Kenya. Get a free quote today!" />
+        <meta property="og:image" content="https://nexoracreatives.co.ke/og-image.jpg" /> {/* You need to upload an image to your public folder named og-image.jpg */}
+        <meta property="og:url" content="https://nexoracreatives.co.ke/" />
+        <meta property="og:type" content="website" />
+      </Helmet>
      {/* Hero Section - Fun & Creative Style */}
       <section className="relative h-[700px] flex items-center justify-center text-center text-white overflow-hidden font-creative">
         
