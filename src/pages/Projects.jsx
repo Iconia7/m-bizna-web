@@ -9,10 +9,14 @@ import emailjs from '@emailjs/browser';
 import picture from '../assets/pattern.png';
 import newton from '../assets/newton.jpeg';
 import { Helmet } from 'react-helmet-async';
+import { useRef } from 'react';
+import ReCAPTCHA from "react-google-recaptcha";
 
 const Projects = () => {
   const [filter, setFilter] = useState('All');
   const [githubRepos, setGithubRepos] = useState([]);
+
+  const captchaRef = useRef(null);
   
   // --- FORM LOGIC ---
   const [formData, setFormData] = useState({ name: '', email: '' });
@@ -29,10 +33,11 @@ const Projects = () => {
         return;
     }
 
-        if (window.grecaptcha && window.grecaptcha.getResponse().length === 0) {
-        alert("Please verify that you are not a robot.");
-        return;
-    }
+const token = captchaRef.current.getValue();
+if (!token) {
+    alert("Please verify that you are not a robot.");
+    return;
+}
 
     setStatus('loading');
 
@@ -73,7 +78,7 @@ const Projects = () => {
 
         setStatus('success');
         setFormData({ name: '', email: '' });
-         if(window.grecaptcha) window.grecaptcha.reset();
+         captchaRef.current.reset();
         setTimeout(() => setStatus('idle'), 5000);
 
     } catch (error) {
@@ -254,9 +259,12 @@ const Projects = () => {
                             className="flex-1 px-6 py-4 rounded-full bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-brand-rose focus:bg-white/20 transition"
                         />
                     </div>
-                    <div className="md:col-span-2 flex justify-center mb-4">
-                    <div className="g-recaptcha" data-sitekey="6LfWPTwsAAAAAL7MIvw9G_BLeA7il4BTwNJCu7eN"></div>
-                </div>
+                    <div className="flex justify-center mb-4">
+    <ReCAPTCHA
+        ref={captchaRef}
+        sitekey="6LfWPTwsAAAAAL7MIvw9G_BLeA7il4BTwNJCu7eN"
+    />
+</div>
                     <button 
                         type="submit"
                         disabled={status === 'loading' || status === 'success'}

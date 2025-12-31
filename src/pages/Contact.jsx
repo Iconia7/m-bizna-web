@@ -7,6 +7,8 @@ import { db } from '../firebase'; // Ensure you have your firebase config here
 import emailjs from '@emailjs/browser';
 import picture from '../assets/pattern.png';
 import { Helmet } from 'react-helmet-async';
+import { useRef } from 'react';
+import ReCAPTCHA from "react-google-recaptcha";
 
 const Contact = () => {
   // 1. State for Form Data
@@ -17,6 +19,8 @@ const Contact = () => {
     service: 'Select Service',
     message: ''
   });
+
+    const captchaRef = useRef(null);
 
   // 2. State for Submission Status
   const [status, setStatus] = useState('idle'); // 'idle', 'loading', 'success', 'error'
@@ -36,10 +40,11 @@ const handleSubmit = async (e) => {
   }
 
     // CHECK CAPTCHA: Ensure window.grecaptcha exists and has a response
-    if (window.grecaptcha && window.grecaptcha.getResponse().length === 0) {
-        alert("Please verify that you are not a robot.");
-        return;
-    }
+const token = captchaRef.current.getValue();
+if (!token) {
+    alert("Please verify that you are not a robot.");
+    return;
+}
 
   setStatus('loading');
 
@@ -110,7 +115,7 @@ const handleSubmit = async (e) => {
     // 4. Success State
     setStatus('success');
     setFormData({ name: '', email: '', phone: '', service: 'Select Service', message: '' });
-    if(window.grecaptcha) window.grecaptcha.reset();
+    captchaRef.current.reset();
     setTimeout(() => setStatus('idle'), 5000);
 
   } catch (error) {
@@ -259,9 +264,12 @@ const handleSubmit = async (e) => {
                   ></textarea>
                 </motion.div>
 
-                <div className="md:col-span-2 flex justify-center mb-4">
-                    <div className="g-recaptcha" data-sitekey="6LfWPTwsAAAAAL7MIvw9G_BLeA7il4BTwNJCu7eN"></div>
-                </div>
+                <div className="flex justify-center mb-4">
+    <ReCAPTCHA
+        ref={captchaRef}
+        sitekey="6LfWPTwsAAAAAL7MIvw9G_BLeA7il4BTwNJCu7eN"
+    />
+</div>
               
                 {/* Submit Button */}
                 <div className="md:col-span-2">

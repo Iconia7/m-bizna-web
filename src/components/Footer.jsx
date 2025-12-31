@@ -6,12 +6,15 @@ import { db } from '../firebase';
 import emailjs from '@emailjs/browser';
 import Logo from '../assets/NCS_Logo.png'; 
 import FooterPattern from '../assets/pattern.png';
+import { useRef } from 'react';
+import ReCAPTCHA from "react-google-recaptcha";
 
 const Footer = () => {
   // --- NEWSLETTER LOGIC ---
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('');
+  const captchaRef = useRef(null);
 
   const handleSubscribe = async (e) => {
     e.preventDefault();
@@ -21,11 +24,11 @@ const Footer = () => {
         return;
     }
 
-    if (window.grecaptcha && window.grecaptcha.getResponse().length === 0) {
-        setMessage("Please verify you are not a robot.");
-        setStatus('error');
-        return;
-    }
+const token = captchaRef.current.getValue();
+if (!token) {
+    alert("Please verify that you are not a robot.");
+    return;
+}
 
     setStatus('loading');
     setMessage('');
@@ -56,7 +59,7 @@ const Footer = () => {
         setStatus('success');
         setEmail('');
         setMessage('Thanks for subscribing!');
-        if(window.grecaptcha) window.grecaptcha.reset();
+        captchaRef.current.reset();
         setTimeout(() => { setStatus('idle'); setMessage(''); }, 3000);
 
     } catch (error) {
@@ -136,8 +139,13 @@ const Footer = () => {
                 className="bg-gray-800 text-white p-3 rounded-md w-full focus:outline-none focus:ring-1 focus:ring-brand-rose border border-gray-700 placeholder-gray-500 bg-opacity-50 disabled:opacity-50" 
             />
 
-            <div className="mb-3 transform scale-75 origin-left"> 
-    <div className="g-recaptcha" data-size="compact" data-sitekey="6LfWPTwsAAAAAL7MIvw9G_BLeA7il4BTwNJCu7eN"></div>
+           {/* Place this right before the Subscribe button */}
+<div className="mb-2 flex justify-center md:justify-start">
+    <ReCAPTCHA
+        ref={captchaRef}
+        sitekey="6LfWPTwsAAAAAL7MIvw9G_BLeA7il4BTwNJCu7eN"
+        size="compact"  // <--- IMPORTANT for Footer
+    />
 </div>
             
             <button 

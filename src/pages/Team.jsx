@@ -8,6 +8,8 @@ import { db } from '../firebase';
 import emailjs from '@emailjs/browser';
 import picture from '../assets/pattern.png';
 import { Helmet } from 'react-helmet-async';
+import { useRef } from 'react';
+import ReCAPTCHA from "react-google-recaptcha";
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -19,6 +21,7 @@ const Team = () => {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState('idle'); // 'idle', 'loading', 'success', 'error'
   const [message, setMessage] = useState('');
+  const captchaRef = useRef(null);
 
   const handleSubscribe = async (e) => {
     e.preventDefault();
@@ -31,11 +34,11 @@ const Team = () => {
     }
 
     // CAPTCHA CHECK (If implemented globally, add here. For now, simple check is okay)
-    if (window.grecaptcha && window.grecaptcha.getResponse().length === 0) {
-        setMessage("Please verify you are not a robot.");
-        setStatus('error');
-        return;
-    }
+ const token = captchaRef.current.getValue();
+if (!token) {
+    alert("Please verify that you are not a robot.");
+    return;
+}
 
     setStatus('loading');
     setMessage('');
@@ -69,7 +72,7 @@ const Team = () => {
         setMessage('Thanks for subscribing!');
         
         // Reset Captcha if visible
-        if(window.grecaptcha) window.grecaptcha.reset();
+        captchaRef.current.reset();
 
         setTimeout(() => {
             setStatus('idle');
@@ -188,9 +191,12 @@ const Team = () => {
                              />
                          </div>
 
-                         <div className="md:col-span-2 flex justify-center mb-4">
-                    <div className="g-recaptcha" data-sitekey="6LfWPTwsAAAAAL7MIvw9G_BLeA7il4BTwNJCu7eN"></div>
-                </div>
+                         <div className="flex justify-center mb-4">
+    <ReCAPTCHA
+        ref={captchaRef}
+        sitekey="6LfWPTwsAAAAAL7MIvw9G_BLeA7il4BTwNJCu7eN"
+    />
+</div>
                          
                          <button 
                             type="submit"

@@ -8,12 +8,15 @@ import { db } from '../firebase';
 import emailjs from '@emailjs/browser';
 import picture from '../assets/pattern.png';
 import { Helmet } from 'react-helmet-async';
+import { useRef } from 'react';
+import ReCAPTCHA from "react-google-recaptcha";
 
 const ServiceDetails = () => {
   const { id } = useParams();
   const service = services.find((s) => s.id === parseInt(id));
   const currentService = service || services[0];
   const { details } = currentService;
+  const captchaRef = useRef(null);
 
   // --- FORM LOGIC ---
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -30,10 +33,11 @@ const ServiceDetails = () => {
         return;
     }
 
-    if (window.grecaptcha && window.grecaptcha.getResponse().length === 0) {
-        alert("Please verify that you are not a robot.");
-        return;
-    }
+const token = captchaRef.current.getValue();
+if (!token) {
+    alert("Please verify that you are not a robot.");
+    return;
+}
 
     setStatus('loading');
 
@@ -74,7 +78,7 @@ const ServiceDetails = () => {
 
         setStatus('success');
         setFormData({ name: '', email: '', message: '' });
-        if(window.grecaptcha) window.grecaptcha.reset();
+        captchaRef.current.reset();
         setTimeout(() => setStatus('idle'), 5000);
 
     } catch (error) {
@@ -220,9 +224,12 @@ const ServiceDetails = () => {
                                 className="w-full p-3 rounded bg-white/10 border border-white/20 focus:outline-none focus:border-brand-rose text-white placeholder-gray-400"
                              ></textarea>
 
-                             <div className="md:col-span-2 flex justify-center mb-4">
-                    <div className="g-recaptcha" data-sitekey="6LfWPTwsAAAAAL7MIvw9G_BLeA7il4BTwNJCu7eN"></div>
-                </div>
+                             <div className="flex justify-center mb-4">
+    <ReCAPTCHA
+        ref={captchaRef}
+        sitekey="6LfWPTwsAAAAAL7MIvw9G_BLeA7il4BTwNJCu7eN"
+    />
+</div>
                              
                              <button 
                                 type="submit"

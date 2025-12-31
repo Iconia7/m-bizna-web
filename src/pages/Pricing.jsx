@@ -8,12 +8,16 @@ import { db } from '../firebase';
 import emailjs from '@emailjs/browser';
 import picture from '../assets/pattern.png';
 import { Helmet } from 'react-helmet-async';
+import { useRef } from 'react';
+import ReCAPTCHA from "react-google-recaptcha";
 
 const Pricing = () => {
   // --- STATE MANAGEMENT ---
   const [selectedPlan, setSelectedPlan] = useState(null); // Stores the plan user clicked
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('mpesa'); // 'mpesa', 'invoice', 'visa'
+
+  const captchaRef = useRef(null);
   
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', mpesaCode: '' });
   const [status, setStatus] = useState('idle'); // 'idle', 'loading', 'success', 'error'
@@ -50,10 +54,11 @@ const Pricing = () => {
     }
 
     
-    if (window.grecaptcha && window.grecaptcha.getResponse().length === 0) {
-        alert("Please verify that you are not a robot.");
-        return;
-    }
+const token = captchaRef.current.getValue();
+if (!token) {
+    alert("Please verify that you are not a robot.");
+    return;
+}
 
     setStatus('loading');
 
@@ -122,7 +127,7 @@ const Pricing = () => {
         ]);
 
         setStatus('success');
-        if(window.grecaptcha) window.grecaptcha.reset();
+        captchaRef.current.reset();
         setTimeout(() => closeModal(), 5000);
 
     } catch (error) {
@@ -321,9 +326,12 @@ const Pricing = () => {
                                 )}
                             </div>
 
-                            <div className="md:col-span-2 flex justify-center mb-4">
-                    <div className="g-recaptcha" data-sitekey="6LfWPTwsAAAAAL7MIvw9G_BLeA7il4BTwNJCu7eN"></div>
-                </div>
+                            <div className="flex justify-center mb-4">
+    <ReCAPTCHA
+        ref={captchaRef}
+        sitekey="6LfWPTwsAAAAAL7MIvw9G_BLeA7il4BTwNJCu7eN"
+    />
+</div>
 
                             {/* Submit Button */}
                             <button 
