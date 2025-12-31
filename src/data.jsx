@@ -1,5 +1,13 @@
 import { Smartphone, PenTool, Layout, Globe, Search, Database } from 'lucide-react';
 import newtonImg from './assets/newton.jpeg';
+import dita from './assets/banner.png';
+import mbizna from './assets/mbizna.png';
+import kadi from './assets/kadi.png';
+import keja from './assets/keja.png';
+import blog1 from './assets/blog1.png';
+import blog2 from './assets/blog2.png';
+import blog3 from './assets/blog3.png';
+import blog4 from './assets/blog4.png';
 
 export const services = [
   { 
@@ -106,7 +114,7 @@ export const projects = [
     title: "Keja Hunter", 
     category: "Mobile App", 
     // Replace with a screenshot of your actual app later
-    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&q=80",
+    image: keja,
     client: "University Students",
     date: "Dec 2025",
     location: "Nairobi, Kenya",
@@ -118,7 +126,7 @@ export const projects = [
     id: 2, 
     title: "M-Bizna", 
     category: "Fintech App", 
-    image: "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?auto=format&fit=crop&q=80",
+    image: mbizna,
     client: "Retail Merchants",
     date: "Sept 2025",
     location: "Thika, Kenya",
@@ -130,7 +138,7 @@ export const projects = [
     id: 3, 
     title: "DITA Club App", 
     category: "Mobile App", 
-    image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80",
+    image: dita,
     client: "Daystar IT Association",
     date: "Aug 2025",
     location: "Daystar University",
@@ -142,7 +150,7 @@ export const projects = [
     id: 4, 
     title: "Kadi KE", 
     category: "Game Development", 
-    image: "https://images.unsplash.com/photo-1611996575749-79a3a250f948?auto=format&fit=crop&q=80",
+    image: kadi,
     client: "Personal Project",
     date: "Dec 2025",
     location: "Kenya",
@@ -266,7 +274,7 @@ export const blogs = [
     category: "Web Development",
     author: "Newton Mwangi",
     date: "Feb 19, 2025",
-    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80",
+    image: blog1,
     excerpt: "Discover the latest technologies and frameworks that are shaping the future of the web.",
     content: {
       intro: "As we move further into the digital age, web development continues to evolve at a breakneck pace. From AI-driven interfaces to decentralized web applications, 2025 promises to be a year of significant transformation. Developers are no longer just coding; they are architecting intelligent ecosystems.",
@@ -288,7 +296,7 @@ export const blogs = [
     category: "Cloud Computing",
     author: "Sarah Connor",
     date: "Feb 15, 2025",
-    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80",
+    image: blog2,
     excerpt: "How Artificial Intelligence is optimizing cloud infrastructure and reducing operational costs.",
     content: {
       intro: "Cloud computing provides the infrastructure, but AI provides the intelligence. Together, they are automating complex tasks that previously required human intervention, leading to what industry experts call 'Self-Healing Infrastructure'.",
@@ -309,7 +317,7 @@ export const blogs = [
     category: "Mobile App",
     author: "Mike Ross",
     date: "Feb 10, 2025",
-    image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80",
+    image: blog3,
     excerpt: "Why users are preferring all-in-one solutions over single-purpose applications.",
     content: {
       intro: "Super apps like WeChat have dominated Asia for years, and now the trend is moving global. Users are experiencing 'app fatigue'—they don't want to download 50 different apps. They want one app to chat, pay bills, order food, and book rides.",
@@ -330,7 +338,7 @@ export const blogs = [
     category: "UI/UX Design",
     author: "Emily Clark",
     date: "Feb 05, 2025",
-    image: "https://images.unsplash.com/photo-1586717791821-3f44a5638d4f?auto=format&fit=crop&q=80",
+    image: blog4,
     excerpt: "Key principles to ensure your mobile application engages users effectively.",
     content: {
       intro: "A pretty app is useless if users can't navigate it. In 2025, mobile usability is about accessibility, dark mode defaults, and 'thumb-friendly' zones. We explore the core principles that separate top-tier apps from the rest.",

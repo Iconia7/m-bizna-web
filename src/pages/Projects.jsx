@@ -7,6 +7,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase'; 
 import emailjs from '@emailjs/browser';
 import picture from '../assets/pattern.png';
+import newton from '../assets/newton.jpeg';
 
 const Projects = () => {
   const [filter, setFilter] = useState('All');
@@ -262,7 +263,7 @@ const Projects = () => {
                 <div className="relative">
                     <div className="absolute -inset-4 border-2 border-dashed border-gray-600 rounded-full animate-spin-slow"></div>
                     <img 
-                        src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80" 
+                        src={newton}
                         alt="Consultant" 
                         className="w-64 h-64 object-cover rounded-full border-4 border-brand-rose shadow-2xl"
                     />
