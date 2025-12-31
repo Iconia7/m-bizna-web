@@ -89,7 +89,7 @@ const Pricing = () => {
             clientBody = `Hi ${formData.name},\n\nThank you for your payment of KES ${selectedPlan.price}. We have received your M-Pesa code (${formData.mpesaCode}) and are processing your order.\n\nPlan: ${selectedPlan.plan}\nStatus: Paid\n\nWelcome to Nexora!`;
         } else {
             clientSubject = `Invoice Generated - ${selectedPlan.plan}`;
-            clientBody = `Hi ${formData.name},\n\nThank you for choosing the ${selectedPlan.plan}. Please find your invoice details below:\n\nAmount Due: KES ${selectedPlan.price}\nTill Number: 3155712\nPlease make payment within 24 hours to activate your service.\n\nBest,\nNexora Team`;
+            clientBody = `Hi ${formData.name},\n\nThank you for choosing the ${selectedPlan.plan}. Please find your invoice details below:\n\nAmount Due: KES ${selectedPlan.price}\nPaybill: 247247\nAccount: 0340183028114\n\nPlease make payment within 24 hours to activate your service.\n\nBest,\nNexora Team`;
         }
 
         const adminParams = {
@@ -292,7 +292,7 @@ const Pricing = () => {
                                             <p className="text-2xl font-bold text-green-600 tracking-widest flex items-center justify-center gap-2">
                                                 247247 <Copy size={14} className="cursor-pointer text-gray-400 hover:text-black"/>
                                             </p>
-                                            <p className="text-xs text-gray-500 mt-1">Account: 0712345678 (Your Phone)</p>
+                                            <p className="text-xs text-gray-500 mt-1">Account: 0340183028114</p>
                                         </div>
                                         <input 
                                             type="text" name="mpesaCode" placeholder="Enter M-Pesa Transaction Code (e.g. SGH...)" 

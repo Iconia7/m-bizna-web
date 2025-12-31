@@ -2,21 +2,19 @@ import React, { useState } from 'react';
 import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; 
-import { db } from '../firebase'; // Ensure this path is correct
+import { db } from '../firebase'; 
 import emailjs from '@emailjs/browser';
-import Logo from '../assets/NCS_Logo.png'; // Ensure you are using the correct logo file
+import Logo from '../assets/NCS_Logo.png'; 
 import FooterPattern from '../assets/pattern.png';
 
 const Footer = () => {
-  // 1. State for Newsletter Logic
+  // --- NEWSLETTER LOGIC ---
   const [email, setEmail] = useState('');
-  const [status, setStatus] = useState('idle'); // 'idle', 'loading', 'success', 'error'
+  const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('');
 
-  // 2. Handle Subscribe Function
   const handleSubscribe = async (e) => {
     e.preventDefault();
-    
     if (!email || !email.includes('@')) {
         setMessage('Please enter a valid email.');
         setStatus('error');
@@ -27,22 +25,24 @@ const Footer = () => {
     setMessage('');
 
     try {
-        // A. Save to Firebase
+        // 1. Save to Firebase
         await addDoc(collection(db, "newsletter_subscribers"), {
             email: email,
             timestamp: serverTimestamp(),
             source: 'Footer'
         });
 
-        // B. Send Email via EmailJS (Optional: Create a specific template for Newsletter)
-        // You can use the same keys as before, or create a new template for "Newsletter Subscription"
+        // 2. Send Email Notification
         const serviceID = "service_nhwsclu"; 
-        const templateID = "template_7i8obf5"; 
+        const templateID = "template_61eywtf"; 
         const publicKey = "ctUKvg88_0Th5sfKn";
 
         const templateParams = {
-            user_email: email, 
-            message: "New Newsletter Subscription from Footer"
+            to_email: "info@nexoracreatives.co.ke", // Notify you
+            from_name: "Newsletter System",
+            reply_to: email,
+            subject: "New Subscriber!",
+            message_body: `New newsletter subscription from: ${email}`
         };
 
         await emailjs.send(serviceID, templateID, templateParams, publicKey);
@@ -50,12 +50,7 @@ const Footer = () => {
         setStatus('success');
         setEmail('');
         setMessage('Thanks for subscribing!');
-        
-        // Reset status after 3 seconds so the user can see the form again if needed
-        setTimeout(() => {
-            setStatus('idle');
-            setMessage('');
-        }, 3000);
+        setTimeout(() => { setStatus('idle'); setMessage(''); }, 3000);
 
     } catch (error) {
         console.error("Error: ", error);
@@ -77,7 +72,6 @@ const Footer = () => {
           backgroundPosition: 'center'
         }}
       ></div>
-
       <div className="absolute inset-0 z-0 bg-brand-charcoal/60"></div>
 
       {/* --- Content --- */}
@@ -121,7 +115,7 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* 4. Newsletter (FUNCTIONAL) */}
+        {/* 4. Newsletter & Socials */}
         <div>
           <h3 className="text-white font-semibold mb-4 text-lg">Newsletter</h3>
           
@@ -149,7 +143,6 @@ const Footer = () => {
                  'Subscribe'}
             </button>
 
-            {/* Status Message */}
             {message && (
                 <p className={`text-xs mt-1 ${status === 'error' ? 'text-red-400' : 'text-green-400'}`}>
                     {status === 'error' && <AlertCircle size={12} className="inline mr-1"/>}
@@ -158,11 +151,44 @@ const Footer = () => {
             )}
           </form>
 
+          {/* ACTIVE SOCIAL MEDIA LINKS */}
           <div className="flex gap-4 mt-6">
-            <a href="#" className="hover:text-brand-rose transition"><Facebook size={20} /></a>
-            <a href="#" className="hover:text-brand-rose transition"><Twitter size={20} /></a>
-            <a href="#" className="hover:text-brand-rose transition"><Instagram size={20} /></a>
-            <a href="#" className="hover:text-brand-rose transition"><Linkedin size={20} /></a>
+            <a 
+                href="https://facebook.com/profile.php?id=100083433616499" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="hover:text-brand-rose transition"
+                aria-label="Facebook"
+            >
+                <Facebook size={20} />
+            </a>
+            <a 
+                href="https://x.com/newtondesigns_" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="hover:text-brand-rose transition"
+                aria-label="Twitter"
+            >
+                <Twitter size={20} />
+            </a>
+            <a 
+                href="https://instagram.com/nexoracreatives_ke?igsh=am5iM3NxYjhxa3Bn" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="hover:text-brand-rose transition"
+                aria-label="Instagram"
+            >
+                <Instagram size={20} />
+            </a>
+            <a 
+                href="https://linkedin.com/in/newton-mwangi-9732142a1" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="hover:text-brand-rose transition"
+                aria-label="LinkedIn"
+            >
+                <Linkedin size={20} />
+            </a>
           </div>
         </div>
 
@@ -172,25 +198,17 @@ const Footer = () => {
       <div className="relative z-10 border-t border-gray-800 pt-8 mt-8">
         <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
           
-          {/* Left Side: Copyright */}
           <div className="text-sm text-gray-500 text-center md:text-left">
             &copy; {new Date().getFullYear()} Nexora Creative Solutions. All Rights Reserved.
           </div>
 
-          {/* Right Side: Legal Links */}
           <div className="flex gap-6 text-sm font-medium">
-            <Link 
-              to="/privacy" 
-              className="text-gray-400 hover:text-brand-rose transition-colors relative group"
-            >
+            <Link to="/privacy" className="text-gray-400 hover:text-brand-rose transition-colors relative group">
               Privacy Policy
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-rose transition-all group-hover:w-full"></span>
             </Link>
             
-            <Link 
-              to="/terms" 
-              className="text-gray-400 hover:text-brand-rose transition-colors relative group"
-            >
+            <Link to="/terms" className="text-gray-400 hover:text-brand-rose transition-colors relative group">
               Terms & Conditions
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-rose transition-all group-hover:w-full"></span>
             </Link>

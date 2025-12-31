@@ -215,6 +215,12 @@ export const team = [
     email: "info@nexoracreatives.co.ke",
     phone: "+254 115 332 870",
     experience: "5+ Years",
+    socials: {
+        facebook: "https://facebook.com/profile.php?id=100083433616499",
+        twitter: "https://x.com/newtondesigns_",
+        linkedin: "https://linkedin.com/in/newton-mwangi-9732142a1", // Replace with your actual LinkedIn URL
+        instagram: "https://instagram.com/nexoracreatives_ke?igsh=am5iM3NxYjhxa3Bn"
+    },
     bio: "Newton is a visionary tech entrepreneur and full-stack developer with a passion for building scalable mobile and web solutions. With expertise in Flutter, React, and Django, he leads Nexora's strategy to deliver innovative digital products for modern businesses.",
     skills: [
       { name: "Mobile Development (Flutter)", level: 95 },

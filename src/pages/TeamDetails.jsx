@@ -79,6 +79,13 @@ const TeamDetails = () => {
 
   if (!member) return <div className="pt-40 text-center">Member not found</div>;
 
+  const SocialIconMap = {
+      facebook: Facebook,
+      twitter: Twitter,
+      linkedin: Linkedin,
+      instagram: Instagram
+  };
+
   return (
     <div className="pt-20">
 
@@ -127,11 +134,20 @@ const TeamDetails = () => {
                     </div>
 
                     <div className="flex justify-center gap-3">
-                        {[Facebook, Twitter, Linkedin, Instagram].map((Icon, i) => (
-                          <a key={i} href="#" className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-brand-charcoal border border-gray-200 hover:bg-brand-rose hover:text-white hover:border-brand-rose transition">
-                             <Icon size={18}/>
-                          </a>
-                        ))}
+                        {member.socials && Object.entries(member.socials).map(([platform, url], i) => {
+                            const Icon = SocialIconMap[platform];
+                            return Icon ? (
+                                <a 
+                                    key={i} 
+                                    href={url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-brand-charcoal border border-gray-200 hover:bg-brand-rose hover:text-white hover:border-brand-rose transition"
+                                >
+                                    <Icon size={18}/>
+                                </a>
+                            ) : null;
+                        })}
                     </div>
                 </motion.div>
             </div>
