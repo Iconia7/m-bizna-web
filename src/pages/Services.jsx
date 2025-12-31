@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { services } from '../data';
-import { ArrowRight, Plus, Minus, HelpCircle } from 'lucide-react';
+import { ArrowRight, Plus, Minus, HelpCircle, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom'; // <--- Import Link
+import { Link } from 'react-router-dom';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; 
+import { db } from '../firebase'; 
+import emailjs from '@emailjs/browser';
 import picture from '../assets/pattern.png';
 
 const fadeInUp = {
@@ -12,6 +15,68 @@ const fadeInUp = {
 
 const Services = () => {
   const [openFaq, setOpenFaq] = useState(0);
+
+  // --- FORM LOGIC ---
+  const [formData, setFormData] = useState({ name: '', email: '' });
+  const [status, setStatus] = useState('idle');
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if(!formData.name || !formData.email) {
+        alert("Please fill in all fields.");
+        return;
+    }
+
+    setStatus('loading');
+
+    try {
+        // 1. Save to Firebase
+        await addDoc(collection(db, "contact_messages"), {
+            ...formData,
+            message: "Quick Quote Request from Services Page", // Default message since form has no textarea
+            timestamp: serverTimestamp(),
+            read: false 
+        });
+
+        // 2. EmailJS Logic
+        const serviceID = "service_nhwsclu"; 
+        const templateID = "template_61eywtf"; 
+        const publicKey = "ctUKvg88_0Th5sfKn";
+
+        const adminParams = {
+            to_email: "info@nexoracreatives.co.ke",
+            from_name: "Nexora Services Page",
+            reply_to: formData.email,
+            subject: `Quick Quote Request from ${formData.name}`,
+            message_body: `Name: ${formData.name}\nEmail: ${formData.email}\n\nRequest:\nClient submitted a request via the Services Page 'Free Quote' form.`
+        };
+
+        const clientParams = {
+            to_email: formData.email,
+            from_name: "Nexora Creative Solutions",
+            reply_to: "info@nexoracreatives.co.ke",
+            subject: `We received your quote request!`,
+            message_body: `Hi ${formData.name},\n\nThanks for your interest in our services. We have received your request for a quote and a member of our team will reach out to you shortly.\n\nBest Regards,\nThe Nexora Team`
+        };
+
+        await Promise.all([
+            emailjs.send(serviceID, templateID, adminParams, publicKey),
+            emailjs.send(serviceID, templateID, clientParams, publicKey)
+        ]);
+
+        setStatus('success');
+        setFormData({ name: '', email: '' });
+        setTimeout(() => setStatus('idle'), 5000);
+
+    } catch (error) {
+        console.error("Error:", error);
+        setStatus('error');
+    }
+  };
 
   const faqs = [
     { question: "What services does your company provide?", answer: "We provide a comprehensive range of digital services including Website Development, Mobile App Development, UI/UX Design, Digital Marketing, and Cloud Computing solutions." },
@@ -23,30 +88,16 @@ const Services = () => {
   return (
     <div className="pt-20">
       
-      {/* 1. Header Section - Image with Overlay */}
+      {/* 1. Header Section */}
       <section className="relative py-24 text-center text-white overflow-hidden">
-        
-        {/* Background Image Layer */}
         <div className="absolute inset-0 z-0">
-          {/* You can change this image URL to a specific one for each page if you want */}
-          <img 
-            src={picture}
-            alt="Background" 
-            className="w-full h-full object-cover"
-          />
-          {/* Dark Overlay (85% Opacity) - This makes it "dull" and readable */}
+          <img src={picture} alt="Background" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-brand-charcoal/55"></div>
         </div>
-
-        {/* Content Layer */}
         <div className="relative z-10 max-w-4xl mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 font-creative">
-            {/* CHANGE THIS TITLE PER PAGE */}
-            Our Services
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 font-creative">Our Services</h1>
           <div className="flex justify-center gap-2 text-gray-300 text-sm font-medium">
             <Link to="/" className="hover:text-white transition-colors">Home</Link> / 
-            {/* CHANGE THIS BREADCRUMB PER PAGE */}
             <span className="text-brand-rose">Services</span>
           </div>
         </div>
@@ -59,9 +110,7 @@ const Services = () => {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            variants={{
-              visible: { transition: { staggerChildren: 0.1 } }
-            }}
+            variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
             className="grid md:grid-cols-3 gap-8"
           >
             {services.map((service) => (
@@ -82,15 +131,9 @@ const Services = () => {
                 </motion.div>
                 <h3 className="text-2xl font-bold mb-4 text-brand-charcoal group-hover:text-brand-rose transition-colors">{service.title}</h3>
                 <p className="text-gray-600 mb-6 leading-relaxed">{service.desc}</p>
-                
-                {/* Learn More Button - Linked to Details Page */}
-                <Link 
-                  to={`/services/${service.id}`} 
-                  className="flex items-center gap-2 text-brand-charcoal font-bold hover:text-brand-rose transition group-hover:gap-4"
-                >
+                <Link to={`/services/${service.id}`} className="flex items-center gap-2 text-brand-charcoal font-bold hover:text-brand-rose transition group-hover:gap-4">
                   Learn More <ArrowRight size={18} />
                 </Link>
-
               </motion.div>
             ))}
           </motion.div>
@@ -137,7 +180,8 @@ const Services = () => {
       {/* 4. Quote & FAQ */}
       <section className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-16">
-            {/* Contact Form */}
+            
+            {/* FUNCTIONAL Contact Form */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -146,12 +190,41 @@ const Services = () => {
             >
                 <div className="absolute top-0 right-0 w-64 h-64 bg-brand-rose rounded-full blur-3xl opacity-20 -mr-16 -mt-16"></div>
                 <h3 className="text-3xl font-bold mb-2">Get Your <span className="text-brand-rose">Free Quote</span> Today!</h3>
-                <form className="space-y-4 relative z-10 mt-8">
-                   <input type="text" placeholder="Your Name *" className="w-full p-4 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-brand-rose transition" />
-                   <input type="email" placeholder="Email Address *" className="w-full p-4 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-brand-rose transition" />
-                   <button className="w-full py-4 bg-brand-rose rounded-lg font-bold text-white hover:bg-white hover:text-brand-rose transition-all shadow-lg transform hover:-translate-y-1">
-                        Send Message
-                    </button>
+                
+                <form onSubmit={handleSubmit} className="space-y-4 relative z-10 mt-8">
+                   <input 
+                       type="text" 
+                       name="name"
+                       value={formData.name}
+                       onChange={handleChange}
+                       placeholder="Your Name *" 
+                       required
+                       className="w-full p-4 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-brand-rose transition" 
+                   />
+                   <input 
+                       type="email" 
+                       name="email"
+                       value={formData.email}
+                       onChange={handleChange}
+                       placeholder="Email Address *" 
+                       required
+                       className="w-full p-4 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-brand-rose transition" 
+                   />
+                   
+                   <button 
+                       type="submit"
+                       disabled={status === 'loading' || status === 'success'}
+                       className={`w-full py-4 rounded-lg font-bold transition-all shadow-lg transform hover:-translate-y-1 flex items-center justify-center gap-2 ${
+                           status === 'success' ? 'bg-green-500 text-white cursor-default' : 
+                           status === 'error' ? 'bg-red-500 text-white' : 
+                           'bg-brand-rose text-white hover:bg-white hover:text-brand-rose'
+                       }`}
+                   >
+                       {status === 'loading' ? <Loader2 className="animate-spin" /> : 
+                        status === 'success' ? <><CheckCircle /> Sent!</> : 
+                        status === 'error' ? <><AlertCircle /> Failed</> : 
+                        'Send Message'}
+                   </button>
                 </form>
             </motion.div>
 

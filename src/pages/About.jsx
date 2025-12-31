@@ -2,7 +2,7 @@ import React from 'react';
 import { team } from '../data';
 import { Play, Trophy, Users, Target, Heart, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom'; // <--- Added Link import
+import { Link } from 'react-router-dom'; 
 import picture from '../assets/pattern.png';
 
 // Animation Variants
@@ -28,34 +28,29 @@ const About = () => {
   return (
     <div className="pt-20 overflow-hidden">
       
-      {/* 1. Header Section - Image with Overlay */}
-            <section className="relative py-24 text-center text-white overflow-hidden">
-              
-              {/* Background Image Layer */}
-              <div className="absolute inset-0 z-0">
-                {/* You can change this image URL to a specific one for each page if you want */}
-                <img 
-                  src={picture}
-                  alt="Background" 
-                  className="w-full h-full object-cover"
-                />
-                {/* Dark Overlay (85% Opacity) - This makes it "dull" and readable */}
-                <div className="absolute inset-0 bg-brand-charcoal/55"></div>
-              </div>
-      
-              {/* Content Layer */}
-              <div className="relative z-10 max-w-4xl mx-auto px-4">
-                <h1 className="text-4xl md:text-5xl font-bold mb-4 font-creative">
-                  {/* CHANGE THIS TITLE PER PAGE */}
-                  About Us
-                </h1>
-                <div className="flex justify-center gap-2 text-gray-300 text-sm font-medium">
-                  <Link to="/" className="hover:text-white transition-colors">Home</Link> / 
-                  {/* CHANGE THIS BREADCRUMB PER PAGE */}
-                  <span className="text-brand-rose">About Us</span>
-                </div>
-              </div>
-            </section>
+      {/* 1. Header Section */}
+      <section className="relative py-24 text-center text-white overflow-hidden">
+        {/* Background Image Layer */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={picture}
+            alt="Background" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-brand-charcoal/55"></div>
+        </div>
+
+        {/* Content Layer */}
+        <div className="relative z-10 max-w-4xl mx-auto px-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 font-creative">
+            About Us
+          </h1>
+          <div className="flex justify-center gap-2 text-gray-300 text-sm font-medium">
+            <Link to="/" className="hover:text-white transition-colors">Home</Link> / 
+            <span className="text-brand-rose">About Us</span>
+          </div>
+        </div>
+      </section>
 
       {/* 2. Intro & Vision Section */}
       <section className="py-20 bg-white">
@@ -90,12 +85,12 @@ const About = () => {
                 viewport={{ once: true }}
                 variants={staggerContainer}
             >
-                <motion.span variants={fadeInUp} className="text-brand-rose font-bold uppercase tracking-wider">Our Vision</motion.span>
+                <motion.span variants={fadeInUp} className="text-brand-rose font-bold uppercase tracking-wider">The Vision</motion.span>
                 <motion.h2 variants={fadeInUp} className="text-4xl font-bold text-brand-charcoal mt-4 mb-6 leading-tight">
                     Transforming Ideas into <br/> <span className="text-brand-rose">Digital Reality</span>
                 </motion.h2>
                 <motion.p variants={fadeInUp} className="text-gray-600 mb-6 text-lg leading-relaxed">
-                    At Nexora Creative Solutions, We believe in the power of technology to solve real-world problems. Our journey began with a simple mission: to help businesses navigate the digital landscape with confidence.
+                    At Nexora Creative Solutions, we believe in the power of technology to solve real-world problems. Our journey began with a simple mission: to help businesses navigate the digital landscape with confidence.
                 </motion.p>
                 
                 <motion.div variants={fadeInUp} className="grid grid-cols-2 gap-6 mt-8">
@@ -118,7 +113,7 @@ const About = () => {
         </div>
       </section>
 
-      {/* 3. Video / Team Action Section */}
+      {/* 3. Video / Stats Section */}
       <section className="py-20 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4">
               <motion.div 
@@ -151,8 +146,8 @@ const About = () => {
                             <p className="text-sm opacity-80">Projects Done</p>
                         </div>
                         <div className="text-center">
-                            <h3 className="text-3xl font-bold">15+</h3>
-                            <p className="text-sm opacity-80">Experts</p>
+                            <h3 className="text-3xl font-bold">5+</h3>
+                            <p className="text-sm opacity-80">Years Experience</p>
                         </div>
                   </div>
               </motion.div>
@@ -198,15 +193,16 @@ const About = () => {
           </div>
       </section>
 
-      {/* 5. Team Section */}
+      {/* 5. Team / Founder Section */}
       <section className="py-20 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4">
               <div className="text-center mb-16">
-                  <span className="text-brand-rose font-bold uppercase tracking-wider">Our Team</span>
-                  <h2 className="text-4xl font-bold text-brand-charcoal mt-2">Meet Our Expert Team</h2>
+                  <span className="text-brand-rose font-bold uppercase tracking-wider">Leadership</span>
+                  <h2 className="text-4xl font-bold text-brand-charcoal mt-2">Meet the Founder</h2>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-8">
+              {/* Updated to Flex & Justify Center to center your single card */}
+              <div className="flex flex-wrap justify-center gap-8">
                   {team.map((member, idx) => (
                       <motion.div 
                           key={idx}
@@ -214,18 +210,18 @@ const About = () => {
                           whileInView={{ opacity: 1, y: 0 }}
                           transition={{ delay: idx * 0.2 }}
                           viewport={{ once: true }}
-                          className="bg-white rounded-2xl overflow-hidden shadow-lg group"
+                          className="bg-white rounded-2xl overflow-hidden shadow-lg group w-full md:w-[350px]"
                       >
-                          <div className="relative h-80 overflow-hidden">
+                          <div className="relative h-96 overflow-hidden">
                               <img src={member.image} alt={member.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                               <div className="absolute inset-0 bg-brand-charcoal/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
-                                  {/* Social Icons Placeholder */}
                                   <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-brand-charcoal hover:bg-brand-rose hover:text-white cursor-pointer transition"><Users size={18}/></div>
                               </div>
                           </div>
                           <div className="p-6 text-center">
                               <h3 className="text-xl font-bold text-brand-charcoal">{member.name}</h3>
                               <p className="text-brand-rose font-medium">{member.role}</p>
+                              <p className="text-gray-500 text-sm mt-3 leading-relaxed">{member.bio}</p>
                           </div>
                       </motion.div>
                   ))}
@@ -233,7 +229,7 @@ const About = () => {
           </div>
       </section>
 
-      {/* 6. Testimonials Section (Dark Blue) */}
+      {/* 6. Testimonials Section */}
       <section className="py-20 bg-brand-charcoal text-white">
           <div className="max-w-7xl mx-auto px-4 text-center">
               <span className="text-brand-rose font-bold uppercase tracking-wider">Testimonials</span>

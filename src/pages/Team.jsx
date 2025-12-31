@@ -50,7 +50,7 @@ const Team = () => {
             <h2 className="text-4xl font-bold text-brand-charcoal mt-2">Meet Our <span className="text-brand-rose">Expert Team</span></h2>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="flex flex-wrap justify-center gap-8">
           {team.map((member) => (
             <motion.div 
               key={member.id}

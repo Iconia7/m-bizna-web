@@ -1,47 +1,102 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { team } from '../data';
-import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone, Briefcase, CheckCircle, Send } from 'lucide-react';
+import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone, Briefcase, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; 
+import { db } from '../firebase'; 
+import emailjs from '@emailjs/browser';
 import picture from '../assets/pattern.png';
 
 const TeamDetails = () => {
   const { id } = useParams();
   const member = team.find(m => m.id === parseInt(id));
 
+  // --- FORM STATE LOGIC ---
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [status, setStatus] = useState('idle'); // 'idle', 'loading', 'success', 'error'
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if(!formData.name || !formData.email || !formData.message) {
+        alert("Please fill in all fields.");
+        return;
+    }
+
+    setStatus('loading');
+
+    try {
+        // 1. Save to Firebase
+        await addDoc(collection(db, "contact_messages"), {
+            ...formData,
+            target: `Direct Message to ${member.name}`, // Tag it as a direct message
+            timestamp: serverTimestamp(),
+            read: false 
+        });
+
+        // 2. EmailJS Configuration
+        const serviceID = "service_nhwsclu"; 
+        const templateID = "template_61eywtf"; 
+        const publicKey = "ctUKvg88_0Th5sfKn";
+
+        // --- Notification for YOU ---
+        const adminParams = {
+            to_email: "info@nexoracreatives.co.ke",
+            from_name: "Nexora Website System",
+            reply_to: formData.email,
+            subject: `Direct Message for ${member.name}`,
+            message_body: `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
+        };
+
+        // --- Auto-Reply for CLIENT ---
+        const clientParams = {
+            to_email: formData.email,
+            from_name: member.name, // Reply comes "from" you personally
+            reply_to: "info@nexoracreatives.co.ke",
+            subject: `Thanks for connecting! - ${member.name}`,
+            message_body: `Hi ${formData.name},\n\nThanks for reaching out to me directly. I have received your message and will get back to you shortly.\n\nBest,\n${member.name}`
+        };
+
+        await Promise.all([
+            emailjs.send(serviceID, templateID, adminParams, publicKey),
+            emailjs.send(serviceID, templateID, clientParams, publicKey)
+        ]);
+
+        setStatus('success');
+        setFormData({ name: '', email: '', message: '' });
+        setTimeout(() => setStatus('idle'), 5000);
+
+    } catch (error) {
+        console.error("Error:", error);
+        setStatus('error');
+    }
+  };
+
   if (!member) return <div className="pt-40 text-center">Member not found</div>;
 
   return (
     <div className="pt-20">
 
-      {/* 1. Header Section - Image with Overlay */}
-            <section className="relative py-24 text-center text-white overflow-hidden">
-              
-              {/* Background Image Layer */}
-              <div className="absolute inset-0 z-0">
-                {/* You can change this image URL to a specific one for each page if you want */}
-                <img 
-                  src={picture}
-                  className="w-full h-full object-cover"
-                />
-                {/* Dark Overlay (85% Opacity) - This makes it "dull" and readable */}
-                <div className="absolute inset-0 bg-brand-charcoal/55"></div>
-              </div>
-      
-              {/* Content Layer */}
-              <div className="relative z-10 max-w-4xl mx-auto px-4">
-                <h1 className="text-4xl md:text-5xl font-bold mb-4 font-creative">
-                  {/* CHANGE THIS TITLE PER PAGE */}
-                  Team Details
-                </h1>
-                <div className="flex justify-center gap-2 text-gray-300 text-sm font-medium">
-                  <Link to="/" className="hover:text-white transition-colors">Home</Link> / 
-                  {/* CHANGE THIS BREADCRUMB PER PAGE */}
-                  <Link to="/services" className="hover:text-white">Team</Link> / 
+      {/* 1. Header Section */}
+      <section className="relative py-24 text-center text-white overflow-hidden">
+        <div className="absolute inset-0 z-0">
+            <img src={picture} className="w-full h-full object-cover" alt="bg"/>
+            <div className="absolute inset-0 bg-brand-charcoal/55"></div>
+        </div>
+        <div className="relative z-10 max-w-4xl mx-auto px-4">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 font-creative">Team Details</h1>
+            <div className="flex justify-center gap-2 text-gray-300 text-sm font-medium">
+                <Link to="/" className="hover:text-white transition-colors">Home</Link> / 
+                <Link to="/about" className="hover:text-white">Team</Link> / 
                 <span className="text-brand-rose">{member.name}</span>
-                </div>
-              </div>
-            </section>
+            </div>
+        </div>
+      </section>
 
       <div className="max-w-7xl mx-auto px-4 py-24">
         <div className="grid lg:grid-cols-3 gap-12">
@@ -72,11 +127,11 @@ const TeamDetails = () => {
                     </div>
 
                     <div className="flex justify-center gap-3">
-                       {[Facebook, Twitter, Linkedin, Instagram].map((Icon, i) => (
-                         <a key={i} href="#" className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-brand-charcoal border border-gray-200 hover:bg-brand-rose hover:text-white hover:border-brand-rose transition">
-                            <Icon size={18}/>
-                         </a>
-                       ))}
+                        {[Facebook, Twitter, Linkedin, Instagram].map((Icon, i) => (
+                          <a key={i} href="#" className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-brand-charcoal border border-gray-200 hover:bg-brand-rose hover:text-white hover:border-brand-rose transition">
+                             <Icon size={18}/>
+                          </a>
+                        ))}
                     </div>
                 </motion.div>
             </div>
@@ -87,7 +142,7 @@ const TeamDetails = () => {
                     <h2 className="text-3xl font-bold text-brand-charcoal mb-6">Biography</h2>
                     <p className="text-gray-600 mb-8 leading-relaxed text-lg">{member.bio}</p>
                     <p className="text-gray-600 mb-12 leading-relaxed">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                        I am dedicated to helping businesses grow through technology. Whether it is building a complex mobile application or a simple landing page, I bring the same level of passion and expertise to every project.
                     </p>
 
                     <h3 className="text-2xl font-bold text-brand-charcoal mb-8">Professional Skills</h3>
@@ -112,22 +167,59 @@ const TeamDetails = () => {
                         ))}
                     </div>
 
-                    {/* Contact Form within details page (from design) */}
+                    {/* FUNCTIONAL Contact Form */}
                     <div className="bg-brand-charcoal rounded-3xl p-10 text-white relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-brand-rose rounded-full blur-[80px] opacity-20"></div>
                         <div className="relative z-10">
                             <span className="text-brand-rose font-bold uppercase tracking-wider text-sm mb-2 block">// Contact Me</span>
                             <h3 className="text-3xl font-bold mb-8">Get In Touch</h3>
                             
-                            <form className="grid md:grid-cols-2 gap-6">
-                                <input type="text" placeholder="Your Name" className="bg-white/10 border border-white/20 p-4 rounded-xl text-white focus:outline-none focus:border-brand-rose" />
-                                <input type="email" placeholder="Your Email" className="bg-white/10 border border-white/20 p-4 rounded-xl text-white focus:outline-none focus:border-brand-rose" />
+                            <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-6">
+                                <input 
+                                    type="text" 
+                                    name="name" 
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    placeholder="Your Name" 
+                                    required
+                                    className="bg-white/10 border border-white/20 p-4 rounded-xl text-white focus:outline-none focus:border-brand-rose" 
+                                />
+                                <input 
+                                    type="email" 
+                                    name="email" 
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    placeholder="Your Email" 
+                                    required
+                                    className="bg-white/10 border border-white/20 p-4 rounded-xl text-white focus:outline-none focus:border-brand-rose" 
+                                />
                                 <div className="md:col-span-2">
-                                    <textarea rows="4" placeholder="Write Message" className="w-full bg-white/10 border border-white/20 p-4 rounded-xl text-white focus:outline-none focus:border-brand-rose"></textarea>
+                                    <textarea 
+                                        name="message" 
+                                        value={formData.message}
+                                        onChange={handleChange}
+                                        rows="4" 
+                                        placeholder="Write Message" 
+                                        required
+                                        className="w-full bg-white/10 border border-white/20 p-4 rounded-xl text-white focus:outline-none focus:border-brand-rose"
+                                    ></textarea>
                                 </div>
-                                <button className="md:col-span-2 bg-brand-rose py-4 rounded-xl font-bold hover:bg-white hover:text-brand-charcoal transition shadow-lg">
-                                    Send Message
-                                </button>
+                                <div className="md:col-span-2">
+                                    <button 
+                                        type="submit"
+                                        disabled={status === 'loading' || status === 'success'}
+                                        className={`w-full py-4 rounded-xl font-bold transition shadow-lg flex items-center justify-center gap-2 ${
+                                            status === 'success' ? 'bg-green-500 text-white cursor-default' : 
+                                            status === 'error' ? 'bg-red-500 text-white' : 
+                                            'bg-brand-rose hover:bg-white hover:text-brand-charcoal'
+                                        }`}
+                                    >
+                                        {status === 'loading' ? <Loader2 className="animate-spin" /> : 
+                                         status === 'success' ? <><CheckCircle /> Message Sent</> : 
+                                         status === 'error' ? <><AlertCircle /> Failed. Try Again</> : 
+                                         'Send Message'}
+                                    </button>
+                                </div>
                             </form>
                         </div>
                     </div>

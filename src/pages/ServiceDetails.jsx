@@ -1,51 +1,102 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { services } from '../data';
-import { CheckCircle, ArrowRight, HelpCircle } from 'lucide-react';
+import { CheckCircle, ArrowRight, HelpCircle, Loader2, CheckCircle as CheckIcon, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; 
+import { db } from '../firebase'; 
+import emailjs from '@emailjs/browser';
 import picture from '../assets/pattern.png';
 
 const ServiceDetails = () => {
   const { id } = useParams();
   const service = services.find((s) => s.id === parseInt(id));
-
-  // Fallback if not found (or default to first service for demo)
   const currentService = service || services[0];
   const { details } = currentService;
 
+  // --- FORM LOGIC ---
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [status, setStatus] = useState('idle');
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if(!formData.name || !formData.email || !formData.message) {
+        alert("Please fill in all fields.");
+        return;
+    }
+
+    setStatus('loading');
+
+    try {
+        // 1. Save to Firebase
+        await addDoc(collection(db, "contact_messages"), {
+            ...formData,
+            service_interest: currentService.title, // Track which service they were looking at
+            timestamp: serverTimestamp(),
+            read: false 
+        });
+
+        // 2. EmailJS Logic
+        const serviceID = "service_nhwsclu"; 
+        const templateID = "template_61eywtf"; 
+        const publicKey = "ctUKvg88_0Th5sfKn";
+
+        const adminParams = {
+            to_email: "info@nexoracreatives.co.ke",
+            from_name: "Nexora Service Page",
+            reply_to: formData.email,
+            subject: `Quote Request for ${currentService.title}`,
+            message_body: `Client: ${formData.name}\nEmail: ${formData.email}\nService Page: ${currentService.title}\n\nMessage:\n${formData.message}`
+        };
+
+        const clientParams = {
+            to_email: formData.email,
+            from_name: "Nexora Creative Solutions",
+            reply_to: "info@nexoracreatives.co.ke",
+            subject: `We received your quote request!`,
+            message_body: `Hi ${formData.name},\n\nThanks for inquiring about our ${currentService.title} services. We have received your request and will get back to you with a quote shortly.\n\nBest Regards,\nThe Nexora Team`
+        };
+
+        await Promise.all([
+            emailjs.send(serviceID, templateID, adminParams, publicKey),
+            emailjs.send(serviceID, templateID, clientParams, publicKey)
+        ]);
+
+        setStatus('success');
+        setFormData({ name: '', email: '', message: '' });
+        setTimeout(() => setStatus('idle'), 5000);
+
+    } catch (error) {
+        console.error("Error:", error);
+        setStatus('error');
+    }
+  };
+
   return (
     <div className="pt-20">
-      {/* 1. Header Section - Image with Overlay */}
+      {/* 1. Header Section */}
       <section className="relative py-24 text-center text-white overflow-hidden">
-        
-        {/* Background Image Layer */}
         <div className="absolute inset-0 z-0">
-          {/* You can change this image URL to a specific one for each page if you want */}
-          <img 
-            src={picture}
-            className="w-full h-full object-cover"
-          />
-          {/* Dark Overlay (85% Opacity) - This makes it "dull" and readable */}
+          <img src={picture} className="w-full h-full object-cover" alt="bg"/>
           <div className="absolute inset-0 bg-brand-charcoal/55"></div>
         </div>
-
-        {/* Content Layer */}
         <div className="relative z-10 max-w-4xl mx-auto px-4">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 font-creative">
-            {/* CHANGE THIS TITLE PER PAGE */}
             Service Details
           </h1>
           <div className="flex justify-center gap-2 text-gray-300 text-sm font-medium">
             <Link to="/" className="hover:text-white transition-colors">Home</Link> / 
-            {/* CHANGE THIS BREADCRUMB PER PAGE */}
             <Link to="/services" className="hover:text-white">Services</Link> / 
-          <span className="text-brand-rose">{currentService.title}</span>
+            <span className="text-brand-rose">{currentService.title}</span>
           </div>
         </div>
       </section>
 
       <div className="max-w-7xl mx-auto px-4 py-20">
-         
          <div className="grid lg:grid-cols-3 gap-12">
             
             {/* 2. Main Content */}
@@ -77,7 +128,6 @@ const ServiceDetails = () => {
                         ))}
                     </div>
                     
-                    {/* Images Grid */}
                     <div className="grid md:grid-cols-2 gap-6 mb-12">
                         <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&q=80" className="rounded-2xl shadow-lg" alt="Work 1"/>
                         <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&q=80" className="rounded-2xl shadow-lg" alt="Work 2"/>
@@ -96,7 +146,6 @@ const ServiceDetails = () => {
                                 </div>
                             </div>
                         ))}
-                        {/* Fallback if no expertise data */}
                         {(!details?.expertise || details.expertise.length === 0) && (
                             <p className="text-gray-500 italic">Detailed expertise info coming soon.</p>
                         )}
@@ -105,11 +154,11 @@ const ServiceDetails = () => {
                 </motion.div>
             </div>
 
-            {/* 3. Sidebar (Contact Form & Info) */}
+            {/* 3. Sidebar */}
             <div className="lg:col-span-1">
                 <div className="sticky top-24 space-y-8">
                     
-                    {/* Categories / Services List */}
+                    {/* Services List */}
                     <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
                         <h3 className="font-bold text-xl text-brand-charcoal mb-4">All Services</h3>
                         <div className="space-y-2">
@@ -125,17 +174,55 @@ const ServiceDetails = () => {
                         </div>
                     </div>
 
-                    {/* Contact Form Sidebar */}
+                    {/* Functional Contact Form */}
                     <div className="bg-brand-charcoal text-white p-8 rounded-2xl shadow-xl relative overflow-hidden">
                          <div className="absolute top-0 right-0 w-32 h-32 bg-brand-rose/20 rounded-full -mr-10 -mt-10 blur-xl"></div>
                          <h3 className="text-2xl font-bold mb-2">Get Your <span className="text-brand-rose">Free Quote</span></h3>
                          <p className="text-gray-400 text-sm mb-6">Fill the form and we'll get back to you shortly.</p>
                          
-                         <form className="space-y-4 relative z-10">
-                             <input type="text" placeholder="Name" className="w-full p-3 rounded bg-white/10 border border-white/20 focus:outline-none focus:border-brand-rose text-white placeholder-gray-400"/>
-                             <input type="email" placeholder="Email" className="w-full p-3 rounded bg-white/10 border border-white/20 focus:outline-none focus:border-brand-rose text-white placeholder-gray-400"/>
-                             <textarea rows="3" placeholder="Message" className="w-full p-3 rounded bg-white/10 border border-white/20 focus:outline-none focus:border-brand-rose text-white placeholder-gray-400"></textarea>
-                             <button className="w-full bg-brand-rose py-3 rounded font-bold hover:bg-white hover:text-brand-rose transition">Submit Now</button>
+                         <form onSubmit={handleSubmit} className="space-y-4 relative z-10">
+                             <input 
+                                type="text" 
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                placeholder="Name" 
+                                required
+                                className="w-full p-3 rounded bg-white/10 border border-white/20 focus:outline-none focus:border-brand-rose text-white placeholder-gray-400"
+                             />
+                             <input 
+                                type="email" 
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                placeholder="Email" 
+                                required
+                                className="w-full p-3 rounded bg-white/10 border border-white/20 focus:outline-none focus:border-brand-rose text-white placeholder-gray-400"
+                             />
+                             <textarea 
+                                rows="3" 
+                                name="message"
+                                value={formData.message}
+                                onChange={handleChange}
+                                placeholder="Message" 
+                                required
+                                className="w-full p-3 rounded bg-white/10 border border-white/20 focus:outline-none focus:border-brand-rose text-white placeholder-gray-400"
+                             ></textarea>
+                             
+                             <button 
+                                type="submit"
+                                disabled={status === 'loading' || status === 'success'}
+                                className={`w-full py-3 rounded font-bold transition flex items-center justify-center gap-2 ${
+                                    status === 'success' ? 'bg-green-500 text-white cursor-default' : 
+                                    status === 'error' ? 'bg-red-500 text-white' : 
+                                    'bg-brand-rose hover:bg-white hover:text-brand-rose'
+                                }`}
+                             >
+                                {status === 'loading' ? <Loader2 className="animate-spin" size={18} /> : 
+                                 status === 'success' ? <><CheckIcon size={18}/> Sent</> : 
+                                 status === 'error' ? <><AlertCircle size={18}/> Failed</> : 
+                                 'Submit Now'}
+                             </button>
                          </form>
                     </div>
 
@@ -146,7 +233,7 @@ const ServiceDetails = () => {
                         </div>
                         <div>
                             <h4 className="font-bold text-brand-charcoal">Have Questions?</h4>
-                            <p className="text-sm text-brand-rose font-bold">+254 700 000 000</p>
+                            <p className="text-sm text-brand-rose font-bold">+254 115 332 870</p>
                         </div>
                     </div>
 
@@ -154,9 +241,7 @@ const ServiceDetails = () => {
             </div>
 
          </div>
-
       </div>
-
     </div>
   );
 };

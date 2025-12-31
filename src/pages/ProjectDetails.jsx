@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { projects } from '../data';
-import { CheckCircle, ArrowRight, MapPin, Calendar, User, Star } from 'lucide-react';
+import { CheckCircle, ArrowRight, MapPin, Calendar, User, Star, Loader2, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; 
+import { db } from '../firebase'; 
+import emailjs from '@emailjs/browser';
 import picture from '../assets/pattern.png';
 
 const fadeInUp = {
@@ -14,40 +17,91 @@ const ProjectDetails = () => {
   const { id } = useParams();
   const project = projects.find((p) => p.id === parseInt(id));
 
+  // --- FORM LOGIC ---
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [status, setStatus] = useState('idle');
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if(!formData.name || !formData.email) {
+        alert("Please fill in required fields.");
+        return;
+    }
+
+    setStatus('loading');
+
+    try {
+        // 1. Save to Firebase
+        await addDoc(collection(db, "contact_messages"), {
+            ...formData,
+            project_interest: project.title, // Tag the specific project
+            timestamp: serverTimestamp(),
+            read: false 
+        });
+
+        // 2. EmailJS Logic
+        const serviceID = "service_nhwsclu"; 
+        const templateID = "template_61eywtf"; 
+        const publicKey = "ctUKvg88_0Th5sfKn";
+
+        const adminParams = {
+            to_email: "info@nexoracreatives.co.ke",
+            from_name: "Nexora Project Page",
+            reply_to: formData.email,
+            subject: `Inquiry via Project: ${project.title}`,
+            message_body: `Client: ${formData.name}\nEmail: ${formData.email}\nProject Page: ${project.title}\n\nMessage:\n${formData.message || "Interested in a similar project."}`
+        };
+
+        const clientParams = {
+            to_email: formData.email,
+            from_name: "Nexora Creative Solutions",
+            reply_to: "info@nexoracreatives.co.ke",
+            subject: `Regarding your project inquiry`,
+            message_body: `Hi ${formData.name},\n\nThanks for viewing our case study on ${project.title}. We have received your inquiry and would love to discuss how we can build something similar for you.\n\nBest Regards,\nThe Nexora Team`
+        };
+
+        await Promise.all([
+            emailjs.send(serviceID, templateID, adminParams, publicKey),
+            emailjs.send(serviceID, templateID, clientParams, publicKey)
+        ]);
+
+        setStatus('success');
+        setFormData({ name: '', email: '', message: '' });
+        setTimeout(() => setStatus('idle'), 5000);
+
+    } catch (error) {
+        console.error("Error:", error);
+        setStatus('error');
+    }
+  };
+
   // Fallback if project not found
   if (!project) return <div className="pt-32 text-center text-2xl">Project not found</div>;
 
   return (
     <div className="pt-20">
 
-      {/* 1. Header Section - Image with Overlay */}
-            <section className="relative py-24 text-center text-white overflow-hidden">
-              
-              {/* Background Image Layer */}
-              <div className="absolute inset-0 z-0">
-                {/* You can change this image URL to a specific one for each page if you want */}
-                <img 
-                  src={picture}
-                  className="w-full h-full object-cover"
-                />
-                {/* Dark Overlay (85% Opacity) - This makes it "dull" and readable */}
-                <div className="absolute inset-0 bg-brand-charcoal/55"></div>
-              </div>
-      
-              {/* Content Layer */}
-              <div className="relative z-10 max-w-4xl mx-auto px-4">
-                <h1 className="text-4xl md:text-5xl font-bold mb-4 font-creative">
-                  {/* CHANGE THIS TITLE PER PAGE */}
-                  Project Details
-                </h1>
-                <div className="flex justify-center gap-2 text-gray-300 text-sm font-medium">
-                  <Link to="/" className="hover:text-white transition-colors">Home</Link> / 
-                  {/* CHANGE THIS BREADCRUMB PER PAGE */}
-                  <Link to="/services" className="hover:text-white">Projects</Link> / 
-                <span className="text-brand-rose">{project.title}</span>
-                </div>
-              </div>
-            </section>
+      {/* 1. Header Section */}
+      <section className="relative py-24 text-center text-white overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img src={picture} className="w-full h-full object-cover" alt="bg"/>
+          <div className="absolute inset-0 bg-brand-charcoal/55"></div>
+        </div>
+        <div className="relative z-10 max-w-4xl mx-auto px-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 font-creative">
+            Project Details
+          </h1>
+          <div className="flex justify-center gap-2 text-gray-300 text-sm font-medium">
+            <Link to="/" className="hover:text-white transition-colors">Home</Link> / 
+            <Link to="/projects" className="hover:text-white">Projects</Link> / 
+            <span className="text-brand-rose">{project.title}</span>
+          </div>
+        </div>
+      </section>
 
       <div className="max-w-7xl mx-auto px-4 py-20">
         
@@ -116,7 +170,7 @@ const ProjectDetails = () => {
             </motion.div>
           </div>
 
-          {/* 4. Right Sidebar: Project Info */}
+          {/* 4. Right Sidebar: Project Info & Form */}
           <div className="lg:col-span-1">
              <motion.div 
                initial={{ opacity: 0, x: 20 }}
@@ -129,46 +183,84 @@ const ProjectDetails = () => {
                    <div className="flex items-start gap-4">
                       <div className="bg-brand-rose/20 p-2 rounded-lg text-brand-rose"><User size={20}/></div>
                       <div>
-                         <span className="text-gray-400 text-sm block">Client:</span>
-                         <span className="font-bold">{project.client}</span>
+                          <span className="text-gray-400 text-sm block">Client:</span>
+                          <span className="font-bold">{project.client}</span>
                       </div>
                    </div>
                    <div className="flex items-start gap-4">
                       <div className="bg-brand-rose/20 p-2 rounded-lg text-brand-rose"><Calendar size={20}/></div>
                       <div>
-                         <span className="text-gray-400 text-sm block">Date:</span>
-                         <span className="font-bold">{project.date}</span>
+                          <span className="text-gray-400 text-sm block">Date:</span>
+                          <span className="font-bold">{project.date}</span>
                       </div>
                    </div>
                    <div className="flex items-start gap-4">
                       <div className="bg-brand-rose/20 p-2 rounded-lg text-brand-rose"><MapPin size={20}/></div>
                       <div>
-                         <span className="text-gray-400 text-sm block">Location:</span>
-                         <span className="font-bold">{project.location}</span>
+                          <span className="text-gray-400 text-sm block">Location:</span>
+                          <span className="font-bold">{project.location}</span>
                       </div>
                    </div>
                    <div className="flex items-start gap-4">
                       <div className="bg-brand-rose/20 p-2 rounded-lg text-brand-rose"><CheckCircle size={20}/></div>
                       <div>
-                         <span className="text-gray-400 text-sm block">Category:</span>
-                         <span className="font-bold">{project.category}</span>
+                          <span className="text-gray-400 text-sm block">Category:</span>
+                          <span className="font-bold">{project.category}</span>
                       </div>
                    </div>
                 </div>
 
+                {/* FUNCTIONAL "Start Similar Project" Form */}
                 <div className="mt-8 pt-8 border-t border-gray-600">
-                   <h4 className="font-bold mb-2">Need help?</h4>
-                   <p className="text-gray-400 text-sm mb-4">Let's discuss your next project.</p>
-                   <Link to="/contact" className="block w-full text-center bg-brand-rose py-3 rounded-lg font-bold hover:bg-white hover:text-brand-rose transition">
-                      Contact Us
-                   </Link>
+                   <h4 className="font-bold mb-4 text-brand-rose">Want a project like this?</h4>
+                   <form onSubmit={handleSubmit} className="space-y-3">
+                       <input 
+                            type="text" 
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            placeholder="Your Name" 
+                            className="w-full p-3 rounded bg-white/10 border border-white/20 focus:outline-none focus:border-brand-rose text-white placeholder-gray-400 text-sm"
+                       />
+                       <input 
+                            type="email" 
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            placeholder="Your Email" 
+                            className="w-full p-3 rounded bg-white/10 border border-white/20 focus:outline-none focus:border-brand-rose text-white placeholder-gray-400 text-sm"
+                       />
+                       <textarea 
+                            name="message"
+                            value={formData.message}
+                            onChange={handleChange}
+                            rows="2" 
+                            placeholder="Any details?" 
+                            className="w-full p-3 rounded bg-white/10 border border-white/20 focus:outline-none focus:border-brand-rose text-white placeholder-gray-400 text-sm"
+                       ></textarea>
+                       
+                       <button 
+                            type="submit"
+                            disabled={status === 'loading' || status === 'success'}
+                            className={`w-full py-3 rounded font-bold transition flex items-center justify-center gap-2 text-sm ${
+                                status === 'success' ? 'bg-green-500 text-white cursor-default' : 
+                                status === 'error' ? 'bg-red-500 text-white' : 
+                                'bg-brand-rose hover:bg-white hover:text-brand-rose'
+                            }`}
+                       >
+                            {status === 'loading' ? <Loader2 className="animate-spin" size={16} /> : 
+                             status === 'success' ? <><CheckCircle size={16}/> Request Sent</> : 
+                             status === 'error' ? <><AlertCircle size={16}/> Failed</> : 
+                             'Get a Quote'}
+                       </button>
+                   </form>
                 </div>
              </motion.div>
           </div>
 
         </div>
 
-        {/* 5. View Other Projects (Slider simulation) */}
+        {/* 5. View Other Projects */}
         <section className="mt-24">
             <div className="flex justify-between items-center mb-8">
                <h2 className="text-3xl font-bold text-brand-charcoal">View Other Projects</h2>

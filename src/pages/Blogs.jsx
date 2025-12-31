@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { blogs } from '../data';
-import { Search, Calendar, User, ArrowRight, ChevronRight } from 'lucide-react';
+import { Search, Calendar, User, ArrowRight, ChevronRight, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'; 
+import { db } from '../firebase'; 
+import emailjs from '@emailjs/browser';
 import picture from '../assets/pattern.png';
 
 const fadeInUp = {
@@ -13,6 +16,68 @@ const fadeInUp = {
 const Blogs = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
+
+  // --- SIDEBAR FORM LOGIC ---
+  const [formData, setFormData] = useState({ name: '', email: '' });
+  const [status, setStatus] = useState('idle');
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if(!formData.name || !formData.email) {
+        alert("Please fill in all fields.");
+        return;
+    }
+
+    setStatus('loading');
+
+    try {
+        // 1. Save to Firebase
+        await addDoc(collection(db, "contact_messages"), {
+            ...formData,
+            message: "Lead from Blog Sidebar", 
+            timestamp: serverTimestamp(),
+            read: false 
+        });
+
+        // 2. EmailJS Logic
+        const serviceID = "service_nhwsclu"; 
+        const templateID = "template_61eywtf"; 
+        const publicKey = "ctUKvg88_0Th5sfKn";
+
+        const adminParams = {
+            to_email: "info@nexoracreatives.co.ke",
+            from_name: "Nexora Blog Sidebar",
+            reply_to: formData.email,
+            subject: `Consultation Request: ${formData.name}`,
+            message_body: `Name: ${formData.name}\nEmail: ${formData.email}\n\nSource: Blog Sidebar Form`
+        };
+
+        const clientParams = {
+            to_email: formData.email,
+            from_name: "Nexora Creative Solutions",
+            reply_to: "info@nexoracreatives.co.ke",
+            subject: `Let's discuss your ideas!`,
+            message_body: `Hi ${formData.name},\n\nThanks for reaching out while reading our blog. We'd love to help bring your ideas to life. A member of our team will contact you shortly to schedule a free consultation.\n\nBest Regards,\nThe Nexora Team`
+        };
+
+        await Promise.all([
+            emailjs.send(serviceID, templateID, adminParams, publicKey),
+            emailjs.send(serviceID, templateID, clientParams, publicKey)
+        ]);
+
+        setStatus('success');
+        setFormData({ name: '', email: '' });
+        setTimeout(() => setStatus('idle'), 5000);
+
+    } catch (error) {
+        console.error("Error:", error);
+        setStatus('error');
+    }
+  };
 
   const categories = ['All', 'Web Development', 'Mobile App', 'Cloud Computing', 'UI/UX Design'];
 
@@ -26,34 +91,20 @@ const Blogs = () => {
   return (
     <div className="pt-20">
       
-      {/* 1. Header Section - Image with Overlay */}
-            <section className="relative py-24 text-center text-white overflow-hidden">
-              
-              {/* Background Image Layer */}
-              <div className="absolute inset-0 z-0">
-                {/* You can change this image URL to a specific one for each page if you want */}
-                <img 
-                  src={picture}
-                  alt="Background" 
-                  className="w-full h-full object-cover"
-                />
-                {/* Dark Overlay (85% Opacity) - This makes it "dull" and readable */}
-                <div className="absolute inset-0 bg-brand-charcoal/55"></div>
-              </div>
-      
-              {/* Content Layer */}
-              <div className="relative z-10 max-w-4xl mx-auto px-4">
-                <h1 className="text-4xl md:text-5xl font-bold mb-4 font-creative">
-                  {/* CHANGE THIS TITLE PER PAGE */}
-                  Latest News & Blogs
-                </h1>
-                <div className="flex justify-center gap-2 text-gray-300 text-sm font-medium">
-                  <Link to="/" className="hover:text-white transition-colors">Home</Link> / 
-                  {/* CHANGE THIS BREADCRUMB PER PAGE */}
-                  <span className="text-brand-rose">Blogs</span>
-                </div>
-              </div>
-            </section>
+      {/* 1. Header Section */}
+      <section className="relative py-24 text-center text-white overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img src={picture} alt="Background" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-brand-charcoal/55"></div>
+        </div>
+        <div className="relative z-10 max-w-4xl mx-auto px-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 font-creative">Latest News & Blogs</h1>
+          <div className="flex justify-center gap-2 text-gray-300 text-sm font-medium">
+            <Link to="/" className="hover:text-white transition-colors">Home</Link> / 
+            <span className="text-brand-rose">Blogs</span>
+          </div>
+        </div>
+      </section>
 
       <div className="max-w-7xl mx-auto px-4 py-20">
         <div className="grid lg:grid-cols-3 gap-12">
@@ -109,11 +160,11 @@ const Blogs = () => {
 
           {/* 3. Sidebar */}
           <div className="lg:col-span-1 space-y-10">
-             
-             {/* Search Widget */}
-             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                <h3 className="font-bold text-xl text-brand-charcoal mb-4">Search</h3>
-                <div className="relative">
+              
+              {/* Search Widget */}
+              <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                 <h3 className="font-bold text-xl text-brand-charcoal mb-4">Search</h3>
+                 <div className="relative">
                     <input 
                         type="text" 
                         placeholder="Search..." 
@@ -122,13 +173,13 @@ const Blogs = () => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                     <Search className="absolute left-3 top-3.5 text-gray-400" size={18} />
-                </div>
-             </div>
+                 </div>
+              </div>
 
-             {/* Categories Widget */}
-             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                <h3 className="font-bold text-xl text-brand-charcoal mb-4">Categories</h3>
-                <ul className="space-y-3">
+              {/* Categories Widget */}
+              <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                 <h3 className="font-bold text-xl text-brand-charcoal mb-4">Categories</h3>
+                 <ul className="space-y-3">
                     {categories.map((cat, idx) => (
                         <li key={idx}>
                             <button 
@@ -140,13 +191,13 @@ const Blogs = () => {
                             </button>
                         </li>
                     ))}
-                </ul>
-             </div>
+                 </ul>
+              </div>
 
-             {/* Recent Posts Widget */}
-             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                <h3 className="font-bold text-xl text-brand-charcoal mb-4">Recent Posts</h3>
-                <div className="space-y-4">
+              {/* Recent Posts Widget */}
+              <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                 <h3 className="font-bold text-xl text-brand-charcoal mb-4">Recent Posts</h3>
+                 <div className="space-y-4">
                     {blogs.slice(0, 3).map(post => (
                         <div key={post.id} className="flex gap-4 group cursor-pointer">
                             <img src={post.image} alt="thumb" className="w-20 h-20 object-cover rounded-lg" />
@@ -158,18 +209,42 @@ const Blogs = () => {
                             </div>
                         </div>
                     ))}
-                </div>
-             </div>
+                 </div>
+              </div>
 
-             {/* CTA Widget */}
-             <div className="bg-brand-charcoal text-white p-8 rounded-2xl relative overflow-hidden text-center">
-                 <div className="absolute top-0 right-0 w-32 h-32 bg-brand-rose/20 rounded-full -mr-10 -mt-10 blur-xl"></div>
-                 <h3 className="text-2xl font-bold mb-2">Let's Bring Your Ideas to Life!</h3>
-                 <p className="text-gray-400 text-sm mb-6">Contact us today for a free consultation.</p>
-                 <Link to="/contact" className="inline-block bg-brand-rose py-3 px-6 rounded-full font-bold hover:bg-white hover:text-brand-rose transition">
-                    Get A Quote
-                 </Link>
-             </div>
+              {/* Functional CTA / Contact Widget */}
+              <div className="bg-brand-charcoal text-white p-8 rounded-2xl relative overflow-hidden text-center">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-brand-rose/20 rounded-full -mr-10 -mt-10 blur-xl"></div>
+                  <h3 className="text-2xl font-bold mb-2">Let's Bring Your Ideas to Life!</h3>
+                  <p className="text-gray-400 text-sm mb-6">Contact us today for a free consultation.</p>
+                  
+                  <form onSubmit={handleSubmit} className="space-y-3 relative z-10">
+                      <input 
+                          type="text" name="name" value={formData.name} onChange={handleChange}
+                          placeholder="Your Name" 
+                          className="w-full p-3 rounded bg-white/10 border border-white/20 focus:outline-none focus:border-brand-rose text-white placeholder-gray-400 text-sm"
+                      />
+                      <input 
+                          type="email" name="email" value={formData.email} onChange={handleChange}
+                          placeholder="Your Email" 
+                          className="w-full p-3 rounded bg-white/10 border border-white/20 focus:outline-none focus:border-brand-rose text-white placeholder-gray-400 text-sm"
+                      />
+                      <button 
+                          type="submit"
+                          disabled={status === 'loading' || status === 'success'}
+                          className={`w-full py-3 rounded font-bold transition flex items-center justify-center gap-2 text-sm ${
+                              status === 'success' ? 'bg-green-500 text-white cursor-default' : 
+                              status === 'error' ? 'bg-red-500 text-white' : 
+                              'bg-brand-rose hover:bg-white hover:text-brand-charcoal'
+                          }`}
+                      >
+                          {status === 'loading' ? <Loader2 className="animate-spin" size={16}/> : 
+                           status === 'success' ? <><CheckIcon size={16}/> Request Sent</> : 
+                           status === 'error' ? <><AlertCircle size={16}/> Failed</> : 
+                           'Get Free Quote'}
+                      </button>
+                  </form>
+              </div>
 
           </div>
 

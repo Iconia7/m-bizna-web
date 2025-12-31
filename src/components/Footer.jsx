@@ -169,8 +169,34 @@ const Footer = () => {
       </div>
 
       {/* Copyright */}
-      <div className="relative z-10 text-center border-t border-gray-800 pt-8 text-sm text-gray-500">
-        &copy; {new Date().getFullYear()} Nexora Creative Solutions. All Rights Reserved.
+      <div className="relative z-10 border-t border-gray-800 pt-8 mt-8">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+          
+          {/* Left Side: Copyright */}
+          <div className="text-sm text-gray-500 text-center md:text-left">
+            &copy; {new Date().getFullYear()} Nexora Creative Solutions. All Rights Reserved.
+          </div>
+
+          {/* Right Side: Legal Links */}
+          <div className="flex gap-6 text-sm font-medium">
+            <Link 
+              to="/privacy" 
+              className="text-gray-400 hover:text-brand-rose transition-colors relative group"
+            >
+              Privacy Policy
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-rose transition-all group-hover:w-full"></span>
+            </Link>
+            
+            <Link 
+              to="/terms" 
+              className="text-gray-400 hover:text-brand-rose transition-colors relative group"
+            >
+              Terms & Conditions
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-rose transition-all group-hover:w-full"></span>
+            </Link>
+          </div>
+
+        </div>
       </div>
     </footer>
   );

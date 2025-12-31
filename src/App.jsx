@@ -18,6 +18,8 @@ import Team from './pages/Team'; // <--- Import
 import TeamDetails from './pages/TeamDetails'; // <--- Import
 import ComingSoon from './pages/ComingSoon'; // <--- Import
 import NotFound from './pages/NotFound';
+import PrivacyPolicy from './pages/PrivacyPolicy'; // <--- Import
+import Terms from './pages/Terms';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -53,6 +55,8 @@ function App() {
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/careers" element={<Careers />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<Terms />} />
             
             {/* New Routes */}
             <Route path="/team" element={<Team />} />
