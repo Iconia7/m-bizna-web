@@ -1,25 +1,32 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
+import React, { Suspense, lazy } from 'react';
+import Loader from './components/Loader';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import Home from './pages/Home';
-import About from './pages/About';
-import Services from './pages/Services';
-import Projects from './pages/Projects';
-import Pricing from './pages/Pricing';
-import Contact from './pages/Contact';
-import Careers from './pages/Careers';
-import Blogs from './pages/Blogs';
-import ProjectDetails from './pages/ProjectDetails';
-import ServiceDetails from './pages/ServiceDetails';
-import BlogDetails from './pages/BlogDetails';
-import Team from './pages/Team'; 
-import TeamDetails from './pages/TeamDetails'; 
-import ComingSoon from './pages/ComingSoon'; 
-import NotFound from './pages/NotFound';
-import PrivacyPolicy from './pages/PrivacyPolicy'; 
-import Terms from './pages/Terms';
+import CookieBanner from './components/CookieBanner';
+import WhatsAppButton from './components/WhatsAppButton';
+import AnalyticsTracker from './components/AnalyticsTracker';
+import { Toaster } from 'react-hot-toast';
+const Home = lazy(() => import('./pages/Home'));
+const About = lazy(() => import('./pages/About'));
+const Services = lazy(() => import('./pages/Services'));
+const ServiceDetails = lazy(() => import('./pages/ServiceDetails'));
+const Projects = lazy(() => import('./pages/Projects'));
+const ProjectDetails = lazy(() => import('./pages/ProjectDetails'));
+const Blogs = lazy(() => import('./pages/Blogs'));
+const BlogDetails = lazy(() => import('./pages/BlogDetails'));
+const Pricing = lazy(() => import('./pages/Pricing'));
+const Team = lazy(() => import('./pages/Team'));
+const TeamDetails = lazy(() => import('./pages/TeamDetails'));
+const Careers = lazy(() => import('./pages/Careers'));
+const Contact = lazy(() => import('./pages/Contact'));
+const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const Terms = lazy(() => import('./pages/Terms'));
+const ComingSoon = lazy(() => import('./pages/ComingSoon'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+
 
 // Scroll to top on route change
 const ScrollToTop = () => {
@@ -35,6 +42,7 @@ function App() {
     <Router>
       <div className="flex flex-col min-h-screen">
         <ConditionalLayout>
+          <Suspense fallback={<div className="h-screen flex items-center justify-center"><Loader /></div>}>
            <Routes>
              {/* --- LIVE ROUTES --- */}
              
@@ -65,6 +73,7 @@ function App() {
              <Route path="/coming-soon" element={<ComingSoon />} />
              <Route path="*" element={<NotFound />} />
            </Routes>
+          </Suspense>
         </ConditionalLayout>
       </div>
     </Router>
@@ -72,21 +81,42 @@ function App() {
 }
 
 // Wrapper to hide Navbar/Footer only on specific utility pages
+// Wrapper to hide Navbar/Footer only on specific utility pages
 const ConditionalLayout = ({ children }) => {
   const location = useLocation();
   
   // Only hide Navbar/Footer on 'Coming Soon' page now.
-  // The Home page ('/') will now correctly show the Navbar & Footer.
   const hideLayout = location.pathname === '/coming-soon'; 
 
   return (
     <>
+    <AnalyticsTracker />
       <ScrollToTop />
       {!hideLayout && <Navbar />}
       <main className="flex-grow">
         {children}
       </main>
       {!hideLayout && <Footer />}
+
+      {/* --- ADD THEM HERE --- */}
+      {!hideLayout && <CookieBanner />}
+      {!hideLayout && <WhatsAppButton />}
+      <Toaster 
+         position="top-center"
+         toastOptions={{
+           style: {
+             background: '#333',
+             color: '#fff',
+             zIndex: 9999,
+           },
+           success: {
+             iconTheme: {
+               primary: '#A7002A', // Brand Rose color
+               secondary: 'white',
+             },
+           },
+         }}
+       />
     </>
   );
 };

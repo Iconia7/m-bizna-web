@@ -10,6 +10,7 @@ import picture from '../assets/pattern.png';
 import { Helmet } from 'react-helmet-async';
 import { useRef } from 'react';
 import ReCAPTCHA from "react-google-recaptcha";
+import toast from 'react-hot-toast';
 
 const Pricing = () => {
   // --- STATE MANAGEMENT ---
@@ -45,18 +46,18 @@ const Pricing = () => {
 
     // Basic Validation
     if(!formData.name || !formData.email || !formData.phone) {
-        alert("Please fill in your contact details.");
+        toast.error("Please fill in your contact details.");
         return;
     }
     if(paymentMethod === 'mpesa' && !formData.mpesaCode) {
-        alert("Please enter the M-Pesa Transaction Code.");
+        toast.error("Please enter the M-Pesa Transaction Code.");
         return;
     }
 
     
 const token = captchaRef.current.getValue();
 if (!token) {
-    alert("Please verify that you are not a robot.");
+   toast.error("Please verify that you are not a robot 🤖");
     return;
 }
 
@@ -127,12 +128,14 @@ if (!token) {
         ]);
 
         setStatus('success');
+        toast.success("Message sent successfully! We'll be in touch.");
         captchaRef.current.reset();
         setTimeout(() => closeModal(), 5000);
 
     } catch (error) {
         console.error("Payment Error:", error);
         setStatus('error');
+        toast.error("Something went wrong. Please try again.");
     }
   };
 

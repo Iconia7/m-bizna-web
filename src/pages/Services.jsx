@@ -10,6 +10,7 @@ import picture from '../assets/pattern.png';
 import { Helmet } from 'react-helmet-async';
 import { useRef } from 'react';
 import ReCAPTCHA from "react-google-recaptcha";
+import toast from 'react-hot-toast';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -31,13 +32,13 @@ const Services = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if(!formData.name || !formData.email) {
-        alert("Please fill in all fields.");
+        toast.error("Please fill in all required fields.");
         return;
     }
 
 const token = captchaRef.current.getValue();
 if (!token) {
-    alert("Please verify that you are not a robot.");
+    toast.error("Please verify that you are not a robot 🤖");
     return;
 }
 
@@ -79,6 +80,7 @@ if (!token) {
         ]);
 
         setStatus('success');
+        toast.success("Message sent successfully! We'll be in touch.");
         setFormData({ name: '', email: '' });
         captchaRef.current.reset();
         setTimeout(() => setStatus('idle'), 5000);
@@ -86,6 +88,7 @@ if (!token) {
     } catch (error) {
         console.error("Error:", error);
         setStatus('error');
+        toast.error("Something went wrong. Please try again.");
     }
   };
 
@@ -93,7 +96,7 @@ if (!token) {
     { question: "What services does your company provide?", answer: "We provide a comprehensive range of digital services including Website Development, Mobile App Development, UI/UX Design, Digital Marketing, and Cloud Computing solutions." },
     { question: "What industries do you serve?", answer: "We serve a diverse range of industries including Healthcare, E-commerce, Real Estate, Education, and FinTech, delivering custom solutions for each sector." },
     { question: "Do you offer custom IT solutions?", answer: "Yes, absolutely. We specialize in building custom software solutions from the ground up to ensure they align perfectly with your specific business workflows." },
-    { question: "How can I contact your support team?", answer: "You can reach our 24/7 support team via email at support@nexora.co.ke or call us directly at +254 700 000 000." },
+    { question: "How can I contact your support team?", answer: "You can reach our 24/7 support team via email at info@nexoracreatives.co.ke or call us directly at +254 115 332 870." },
   ];
 
   return (

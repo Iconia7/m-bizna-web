@@ -10,6 +10,7 @@ import picture from '../assets/pattern.png';
 import { Helmet } from 'react-helmet-async';
 import { useRef } from 'react';
 import ReCAPTCHA from "react-google-recaptcha";
+import toast from 'react-hot-toast';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -54,14 +55,14 @@ const Careers = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if(!formData.name || !formData.email || !formData.link) {
-        alert("Please fill in required fields.");
+       toast.error("Please fill in all required fields.");
         return;
     }
 
     
 const token = captchaRef.current.getValue();
 if (!token) {
-    alert("Please verify that you are not a robot.");
+    toast.error("Please verify that you are not a robot 🤖");
     return;
 }
 
@@ -103,12 +104,14 @@ if (!token) {
         ]);
 
         setStatus('success');
+        toast.success("Message sent successfully! We'll be in touch.");
         captchaRef.current.reset();
         setTimeout(() => closeApplication(), 3000); // Close modal after 3s on success
 
     } catch (error) {
         console.error("Error:", error);
         setStatus('error');
+        toast.error("Something went wrong. Please try again.");
     }
   };
 

@@ -8,6 +8,7 @@ import Logo from '../assets/NCS_Logo.png';
 import FooterPattern from '../assets/pattern.png';
 import { useRef } from 'react';
 import ReCAPTCHA from "react-google-recaptcha";
+import toast from 'react-hot-toast';
 
 const Footer = () => {
   // --- NEWSLETTER LOGIC ---
@@ -19,14 +20,14 @@ const Footer = () => {
   const handleSubscribe = async (e) => {
     e.preventDefault();
     if (!email || !email.includes('@')) {
-        setMessage('Please enter a valid email.');
+        toast.error("Please enter a valid email.");
         setStatus('error');
         return;
     }
 
 const token = captchaRef.current.getValue();
 if (!token) {
-    alert("Please verify that you are not a robot.");
+   toast.error("Please verify that you are not a robot 🤖");
     return;
 }
 
@@ -58,14 +59,14 @@ if (!token) {
 
         setStatus('success');
         setEmail('');
-        setMessage('Thanks for subscribing!');
+        toast.success("Thanks for subscribing!");
         captchaRef.current.reset();
         setTimeout(() => { setStatus('idle'); setMessage(''); }, 3000);
 
     } catch (error) {
         console.error("Error: ", error);
         setStatus('error');
-        setMessage('Error. Please try again.');
+        toast.error("Something went wrong. Please try again.");
     }
   };
 
@@ -143,10 +144,10 @@ if (!token) {
 <div className="mb-2 flex justify-center md:justify-start">
     <ReCAPTCHA
         ref={captchaRef}
-        sitekey="6LfWPTwsAAAAAL7MIvw9G_BLeA7il4BTwNJCu7eN"
-        size="compact"  // <--- IMPORTANT for Footer
+        sitekey="6LfWPTwsAAAAAL7MIvw9G_BLeA7il4BTwNJCu7eN" // <--- IMPORTANT for Footer
     />
 </div>
+
             
             <button 
                 type="submit"

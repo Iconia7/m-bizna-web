@@ -10,6 +10,7 @@ import picture from '../assets/pattern.png';
 import { Helmet } from 'react-helmet-async';
 import { useRef } from 'react';
 import ReCAPTCHA from "react-google-recaptcha";
+import toast from 'react-hot-toast';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 30 },
@@ -28,7 +29,7 @@ const Team = () => {
     
     // Basic Validation
     if (!email || !email.includes('@')) {
-        setMessage('Please enter a valid email.');
+        toast.error("Please enter a valid email.");
         setStatus('error');
         return;
     }
@@ -36,7 +37,7 @@ const Team = () => {
     // CAPTCHA CHECK (If implemented globally, add here. For now, simple check is okay)
  const token = captchaRef.current.getValue();
 if (!token) {
-    alert("Please verify that you are not a robot.");
+    toast.error("Please verify that you are not a robot 🤖");
     return;
 }
 
@@ -69,7 +70,7 @@ if (!token) {
         // 3. Success State
         setStatus('success');
         setEmail('');
-        setMessage('Thanks for subscribing!');
+        toast.success("Thanks for subscribing!");
         
         // Reset Captcha if visible
         captchaRef.current.reset();
@@ -82,7 +83,7 @@ if (!token) {
     } catch (error) {
         console.error("Error: ", error);
         setStatus('error');
-        setMessage('Error. Please try again.');
+        toast.error("Something went wrong. Please try again.");
     }
   };
 
