@@ -1,4 +1,3 @@
-// api/query.js
 import axios from 'axios';
 import moment from 'moment';
 
@@ -7,13 +6,16 @@ export default async function handler(req, res) {
 
   const { checkoutRequestID } = req.body;
 
-  // CREDENTIALS
+  // --- 1. CREDENTIALS ---
   const consumerKey = "4I0cuGBM1KngCMP6zWAavhWOLI2LMatWA6axE2mp5cyoUKd9"; 
   const consumerSecret = "xDAdv3KxtWiKHwm7UsGkB3OL0Xlv0A0jAOr07XNDHsMZkdKOIc0owkh2Gi5SodBL";
+  
+  // Sandbox defaults
   const businessShortCode = "174379";
   const passkey = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"; 
 
   try {
+    // --- 2. GENERATE TOKEN ---
     const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
     const tokenResponse = await axios.get(
       'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials',
@@ -21,11 +23,13 @@ export default async function handler(req, res) {
     );
     const accessToken = tokenResponse.data.access_token;
 
+    // --- 3. GENERATE PASSWORD ---
     const timestamp = moment().format('YYYYMMDDHHmmss');
     const password = Buffer.from(
       `${businessShortCode}${passkey}${timestamp}`
     ).toString('base64');
 
+    // --- 4. QUERY SAFARICOM (THE FIX IS HERE) ---
     const queryResponse = await axios.post(
       'https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query',
       {
@@ -36,16 +40,19 @@ export default async function handler(req, res) {
       },
       { 
         headers: { Authorization: `Bearer ${accessToken}` },
-        // CRITICAL FIX: Don't throw error if Safaricom returns 404/500
-        validateStatus: () => true 
+        // 👇 THIS LINE PREVENTS THE "403 CRASH"
+        validateStatus: false 
       }
     );
 
-    // Send whatever Safaricom said back to the frontend (Status 200 so Browser doesn't show Red)
+    // --- 5. RETURN SAFARICOM'S RAW ANSWER ---
+    // Even if Safaricom says 403/500, we send it to the frontend to analyze
+    console.log("Safaricom Query Response:", queryResponse.data);
     res.status(200).json(queryResponse.data);
 
   } catch (error) {
     console.error("Query Error:", error.message);
+    // Return a safe error so the frontend doesn't break
     res.status(200).json({ 
         ResultCode: "ERR", 
         ResultDesc: "System Error: " + error.message 
