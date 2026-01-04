@@ -4,10 +4,6 @@ import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import MpesaModal from './MpesaModal';
 
-// --- IMPORTS FROM ASSETS ( To Match Home Page) ---
-import logo from '../assets/NCS_Logo.png'; // Ensure this path is correct!
-import pattern from '../assets/pattern.png';
-
 // --- INVENTORY DATA ---
 const MERCH = [
   {
@@ -88,7 +84,7 @@ const ReceiptView = ({ transaction, item, size, onBack }) => {
         {/* Success Header - Using Brand Colors */}
         <div className="bg-brand-charcoal p-8 text-center relative overflow-hidden">
            {/* Background Pattern Overlay */}
-           <div className="absolute inset-0 opacity-10" style={{backgroundImage: `url(${pattern})`}}></div>
+           <div className="absolute inset-0 opacity-10" style={{backgroundImage: `url('/pattern.png')`}}></div>
            
           <div className="relative z-10">
             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-bounce">
@@ -196,7 +192,7 @@ export default function Shop({ onBack }) {
              
              {/* THE LOGO (Matches Home Page) */}
              <div className="flex items-center gap-2">
-                 <img src={logo} alt="Nexora Logo" className="h-10 w-auto" />
+                 <img src="/NCS_Logo.png" alt="Nexora Logo" className="h-10 w-auto" />
                  <span className="text-brand-charcoal font-black text-xl hidden md:block tracking-tight">SHOP</span>
              </div>
          </div>
@@ -214,9 +210,9 @@ export default function Shop({ onBack }) {
          <div 
             className="absolute inset-0 opacity-20" 
             style={{
-                backgroundImage: `url(${pattern})`,
-                backgroundSize: '300px auto'
-            }}
+    backgroundImage: `url('/pattern.png')`,
+    backgroundSize: '300px auto'
+}}
          ></div>
          
          <motion.div 

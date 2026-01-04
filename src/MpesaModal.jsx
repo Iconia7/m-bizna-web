@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { X, Smartphone, Loader, ShieldCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
-import pattern from '../assets/pattern.png'; // Import your pattern
 
 export default function MpesaModal({ isOpen, onClose, total, onPaymentSuccess }) {
   const [phone, setPhone] = useState("");
@@ -95,7 +94,7 @@ export default function MpesaModal({ isOpen, onClose, total, onPaymentSuccess })
         {/* --- BRANDED HEADER (Charcoal + Pattern) --- */}
         <div className="bg-[#03045E] p-8 text-white text-center relative overflow-hidden">
           {/* Pattern Overlay */}
-          <div className="absolute inset-0 opacity-20" style={{backgroundImage: `url(${pattern})`}}></div>
+          <div className="absolute inset-0 opacity-20" style={{backgroundImage: `url('/pattern.png')`}}></div>
           
           <button onClick={onClose} className="absolute top-4 right-4 bg-white/10 p-2 rounded-full hover:bg-white/20 transition z-20">
               <X size={18} />
