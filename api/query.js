@@ -8,8 +8,8 @@ export default async function handler(req, res) {
   const { checkoutRequestID } = req.body;
 
   // CREDENTIALS
-  const consumerKey = "YOUR_CONSUMER_KEY_HERE"; 
-  const consumerSecret = "YOUR_CONSUMER_SECRET_HERE";
+  const consumerKey = "4I0cuGBM1KngCMP6zWAavhWOLI2LMatWA6axE2mp5cyoUKd9"; 
+  const consumerSecret = "xDAdv3KxtWiKHwm7UsGkB3OL0Xlv0A0jAOr07XNDHsMZkdKOIc0owkh2Gi5SodBL";
   const businessShortCode = "174379";
   const passkey = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"; 
 
