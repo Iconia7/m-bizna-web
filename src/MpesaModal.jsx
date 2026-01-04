@@ -46,13 +46,13 @@ export default function MpesaModal({ isOpen, onClose, total, onPaymentSuccess })
     }
   };
 
-  const checkStatus = async (checkoutID) => {
+const checkStatus = async (checkoutID) => {
     let attempts = 0;
-    const maxAttempts = 20; // Stop after 60 seconds (20 * 3s)
+    const maxAttempts = 20; 
 
     const interval = setInterval(async () => {
         attempts++;
-        setStatusMessage(`Checking payment status... (${attempts})`);
+        // setStatusMessage(`Checking payment... (${attempts})`); // Optional: Uncomment to show attempt count
 
         try {
             const res = await fetch('/api/query', {
@@ -60,36 +60,47 @@ export default function MpesaModal({ isOpen, onClose, total, onPaymentSuccess })
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ checkoutRequestID: checkoutID })
             });
+            
             const data = await res.json();
+            console.log("Safaricom Status:", data); // Check your Console (F12) to see this!
 
-            // Safaricom Result Code "0" means Success
+            // --- SCENARIO 1: SUCCESS ---
             if (data.ResultCode === "0") {
                 clearInterval(interval);
+                toast.success("Payment Received! 🚀");
                 onPaymentSuccess({ 
                     receipt: data.CheckoutRequestID, 
                     phone: phone 
                 });
                 onClose();
             } 
-            // Result Code other than 0 (e.g., 1032) means Cancelled
-            else if (data.ResultCode && data.ResultCode !== "0") {
+            
+            // --- SCENARIO 2: USER CANCELLED / FAILED ---
+            // 1032 = User Cancelled, 1 = Insufficient Funds, 1037 = Timeout
+            else if (['1032', '1', '1037'].includes(data.ResultCode)) {
                 clearInterval(interval);
-                toast.error("Payment Cancelled or Failed.");
+                toast.error(`Payment Failed: ${data.ResultDesc}`);
                 setStep("input");
                 setLoading(false);
             }
+            
+            // --- SCENARIO 3: STILL PROCESSING (Ignore and Keep Looping) ---
+            // If Safaricom returns "The transaction is being processed" or error code 9999
+            else {
+                // Do nothing. Loop continues.
+            }
+
         } catch (error) {
-            // If request fails (e.g. User hasn't typed PIN yet), just keep waiting
-            console.log("Waiting for PIN...");
+            console.log("Polling error", error);
         }
 
         if (attempts >= maxAttempts) {
             clearInterval(interval);
-            toast.error("Payment Timeout. Did you enter your PIN?");
+            toast.error("Timeout. If you entered your PIN, you will receive an SMS shortly.");
             setStep("input");
             setLoading(false);
         }
-    }, 3000); // Check every 3 seconds
+    }, 3000); // Poll every 3 seconds
   };
 
   if (!isOpen) return null;
