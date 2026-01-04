@@ -62,7 +62,92 @@ const MERCH = [
   }
 ];
 
-// --- RECEIPT VIEW (Styled to match Agency) ---
+const ProductCard = ({ item, index, onBuy }) => {
+  const [mySize, setMySize] = useState(""); // <--- Only affects THIS card
+
+  const handlePreOrderClick = () => {
+    if (!mySize) {
+        toast.error("Please select a size first");
+        return;
+    }
+    // Tell the main shop we want to buy this item with this size
+    onBuy(item, mySize);
+  };
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1 }}
+      className="group flex flex-col bg-white rounded-[2rem] p-4 shadow-xl shadow-gray-200/50 hover:shadow-2xl hover:shadow-brand-rose/10 transition-all duration-300 border border-gray-100"
+    >
+      
+      {/* Image */}
+      <div className="bg-gray-50 rounded-[1.5rem] p-6 mb-6 relative overflow-hidden">
+         <motion.img 
+           whileHover={{ scale: 1.1 }}
+           src={item.image} 
+           alt={item.name} 
+           className="w-full h-64 object-contain mix-blend-multiply" 
+         />
+         <div className="absolute top-4 left-4 bg-white/90 backdrop-blur border border-gray-200 text-xs font-bold px-3 py-1 rounded-full text-brand-charcoal">
+           {item.tag}
+         </div>
+      </div>
+
+      {/* Details */}
+      <div className="px-2">
+          <div className="mb-2 flex justify-between items-start">
+              <h3 className="text-lg font-bold text-brand-charcoal leading-tight">{item.name}</h3>
+          </div>
+          
+          <div className="flex justify-between items-center mb-4">
+               <span className="text-2xl font-black text-brand-rose">Ksh {item.price.toLocaleString()}</span>
+               <p className="text-xs text-gray-400 flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-lg">
+                  <Clock size={12}/> {item.shipsIn}
+               </p>
+          </div>
+
+          {/* Size Selector - Uses 'mySize' specific to this card */}
+          <p className="text-xs font-bold text-gray-400 uppercase mb-2">Select Size</p>
+          <div className="flex flex-wrap gap-2 mb-6">
+            {item.sizes.map(size => (
+              <button
+                key={size}
+                onClick={() => setMySize(size)}
+                className={`w-10 h-10 text-sm font-bold rounded-full border transition-all ${
+                  mySize === size 
+                  ? "bg-brand-charcoal text-white border-brand-charcoal scale-110 shadow-lg" 
+                  : "bg-white text-gray-400 border-gray-200 hover:border-brand-rose hover:text-brand-rose"
+                }`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+
+          {/* Action Button */}
+          <motion.button 
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handlePreOrderClick}
+            className="w-full bg-brand-rose text-white py-4 rounded-full font-bold hover:bg-white hover:text-brand-rose border-2 border-brand-rose transition-all flex justify-center items-center gap-2 shadow-[0_10px_20px_rgba(167,0,42,0.2)]"
+          >
+            <ShoppingBag size={20} />
+            Pre-Order Now
+          </motion.button>
+          
+          <div className="mt-4 text-center">
+              <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest flex items-center justify-center gap-1">
+                  <ShieldCheck size={12} /> Secured by PayHero
+              </span>
+          </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// --- 2. RECEIPT VIEW ---
 const ReceiptView = ({ transaction, item, size, onBack }) => {
   const date = new Date().toLocaleString();
   const adminPhone = "254115332870"; 
@@ -81,11 +166,8 @@ const ReceiptView = ({ transaction, item, size, onBack }) => {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 font-sans">
       <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden relative border border-gray-100">
-        {/* Success Header - Using Brand Colors */}
         <div className="bg-brand-charcoal p-8 text-center relative overflow-hidden">
-           {/* Background Pattern Overlay */}
            <div className="absolute inset-0 opacity-10" style={{backgroundImage: `url('/pattern.png')`}}></div>
-           
           <div className="relative z-10">
             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-bounce">
                 <CheckCircle size={32} className="text-brand-rose" />
@@ -95,13 +177,11 @@ const ReceiptView = ({ transaction, item, size, onBack }) => {
           </div>
         </div>
 
-        {/* Receipt Details */}
         <div className="p-8 space-y-6">
           <div className="text-center border-b border-gray-100 pb-6">
             <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Total Paid</p>
             <p className="text-4xl font-black text-brand-charcoal">KES {item.price.toLocaleString()}</p>
           </div>
-
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-500">M-Pesa Ref</span>
@@ -120,20 +200,11 @@ const ReceiptView = ({ transaction, item, size, onBack }) => {
               <span className="font-bold text-brand-rose bg-red-50 px-3 py-1 rounded-full">{size}</span>
             </div>
           </div>
-
-          {/* Action Buttons */}
           <div className="space-y-3 pt-4">
-            <button 
-              onClick={handleWhatsApp}
-              className="w-full bg-brand-rose text-white py-4 rounded-full font-bold hover:bg-white hover:text-brand-rose border border-brand-rose transition-all flex items-center justify-center gap-2 shadow-lg"
-            >
+            <button onClick={handleWhatsApp} className="w-full bg-brand-rose text-white py-4 rounded-full font-bold hover:bg-white hover:text-brand-rose border border-brand-rose transition-all flex items-center justify-center gap-2 shadow-lg">
               <span className="text-xl">👉</span> Send to Nexora for Delivery
             </button>
-            
-            <button 
-              onClick={onBack}
-              className="w-full bg-white border border-gray-200 text-gray-400 py-3 rounded-full font-bold hover:bg-gray-50 transition"
-            >
+            <button onClick={onBack} className="w-full bg-white border border-gray-200 text-gray-400 py-3 rounded-full font-bold hover:bg-gray-50 transition">
               Close Receipt
             </button>
           </div>
@@ -143,31 +214,25 @@ const ReceiptView = ({ transaction, item, size, onBack }) => {
   );
 };
 
-// --- ANIMATIONS ---
-const fadeInUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
-};
-
+// --- 3. MAIN SHOP COMPONENT ---
 export default function Shop({ onBack }) { 
   const [view, setView] = useState('shop');
   const [successData, setSuccessData] = useState(null);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [selectedSize, setSelectedSize] = useState(""); 
+  
+  // State for the ACTIVE transaction (the one being paid for right now)
+  const [buyingItem, setBuyingItem] = useState(null);
+  const [buyingSize, setBuyingSize] = useState(""); 
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
 
-  const handleBuy = (item) => {
-    if (!selectedSize) {
-      toast.error("Please select your size first.");
-      return;
-    }
-    setSelectedItem(item);
+  // This function is passed down to every ProductCard
+  const handleBuyRequest = (item, size) => {
+    setBuyingItem(item);
+    setBuyingSize(size);
     setIsPaymentOpen(true);
   };
 
   return (
     <>
-      {/* CONDITIONAL RENDERING */}
       {view === 'receipt' && successData ? (
         <ReceiptView 
             transaction={successData.details}
@@ -175,13 +240,13 @@ export default function Shop({ onBack }) {
             size={successData.size}
             onBack={() => {
                 setView('shop');
-                setSelectedItem(null);
+                setBuyingItem(null);
             }}
         />
       ) : (
     <div className="bg-white min-h-screen pb-20 font-sans text-brand-charcoal">
       
-      {/* --- NAVBAR (Brand Aligned) --- */}
+      {/* Navbar */}
       <div className="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-gray-100 px-6 py-3 flex items-center justify-between shadow-sm">
          <div className="flex items-center gap-4">
              {onBack && (
@@ -189,14 +254,11 @@ export default function Shop({ onBack }) {
                      <ArrowLeft size={24} />
                  </button>
              )}
-             
-             {/* THE LOGO (Matches Home Page) */}
              <div className="flex items-center gap-2">
-                 <img src="/NCS_Logo.png" alt="Nexora Logo" className="h-10 w-auto" />
+                 <img src="/NCS_Secondary_Logo.png" alt="Nexora Logo" className="h-10 w-auto" />
                  <span className="text-brand-charcoal font-black text-xl hidden md:block tracking-tight">SHOP</span>
              </div>
          </div>
-         
          <div className="flex items-center gap-3">
              <div className="text-[10px] md:text-xs font-bold bg-brand-charcoal text-white px-4 py-2 rounded-full shadow-lg tracking-widest uppercase">
                  Pre-Order Open
@@ -204,21 +266,12 @@ export default function Shop({ onBack }) {
          </div>
       </div>
 
-      {/* --- HERO SECTION (Matches Home Page Style) --- */}
+      {/* Hero */}
       <div className="relative bg-brand-charcoal text-white py-20 overflow-hidden font-creative">
-         {/* Pattern Overlay */}
-         <div 
-            className="absolute inset-0 opacity-20" 
-            style={{
-    backgroundImage: `url('/pattern.png')`,
-    backgroundSize: '300px auto'
-}}
-         ></div>
-         
+         <div className="absolute inset-0 opacity-20" style={{backgroundImage: `url('/pattern.png')`, backgroundSize: '300px auto'}}></div>
          <motion.div 
-            initial="hidden"
-            animate="visible"
-            variants={fadeInUp}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             className="px-6 text-center max-w-3xl mx-auto relative z-10"
           >
             <h2 className="text-5xl md:text-7xl font-black mb-6 tracking-tight leading-tight">
@@ -230,93 +283,29 @@ export default function Shop({ onBack }) {
           </motion.div>
       </div>
 
-      {/* --- PRODUCT GRID --- */}
+      {/* Product Grid - Renders individual ProductCards */}
       <div className="px-6 py-12 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 -mt-10 relative z-10">
         {MERCH.map((item, index) => (
-          <motion.div 
+          <ProductCard 
             key={item.id} 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="group flex flex-col bg-white rounded-[2rem] p-4 shadow-xl shadow-gray-200/50 hover:shadow-2xl hover:shadow-brand-rose/10 transition-all duration-300 border border-gray-100"
-          >
-            
-            {/* Image Card */}
-            <div className="bg-gray-50 rounded-[1.5rem] p-6 mb-6 relative overflow-hidden">
-               <motion.img 
-                 whileHover={{ scale: 1.1 }}
-                 src={item.image} 
-                 alt={item.name} 
-                 className="w-full h-64 object-contain mix-blend-multiply" 
-               />
-               <div className="absolute top-4 left-4 bg-white/90 backdrop-blur border border-gray-200 text-xs font-bold px-3 py-1 rounded-full text-brand-charcoal">
-                 {item.tag}
-               </div>
-            </div>
-
-            {/* Details */}
-            <div className="px-2">
-                <div className="mb-2 flex justify-between items-start">
-                    <h3 className="text-lg font-bold text-brand-charcoal leading-tight">{item.name}</h3>
-                </div>
-                
-                <div className="flex justify-between items-center mb-4">
-                     <span className="text-2xl font-black text-brand-rose">Ksh {item.price.toLocaleString()}</span>
-                     <p className="text-xs text-gray-400 flex items-center gap-1 bg-gray-50 px-2 py-1 rounded-lg">
-                        <Clock size={12}/> {item.shipsIn}
-                     </p>
-                </div>
-
-                {/* Size Selector */}
-                <p className="text-xs font-bold text-gray-400 uppercase mb-2">Select Size</p>
-                <div className="flex flex-wrap gap-2 mb-6">
-                {item.sizes.map(size => (
-                    <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`w-10 h-10 text-sm font-bold rounded-full border transition-all ${
-                        selectedSize === size 
-                        ? "bg-brand-charcoal text-white border-brand-charcoal scale-110 shadow-lg" 
-                        : "bg-white text-gray-400 border-gray-200 hover:border-brand-rose hover:text-brand-rose"
-                    }`}
-                    >
-                    {size}
-                    </button>
-                ))}
-                </div>
-
-                {/* Action Button - EXACT MATCH TO HOME PAGE BUTTONS */}
-                <motion.button 
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleBuy(item)}
-                className="w-full bg-brand-rose text-white py-4 rounded-full font-bold hover:bg-white hover:text-brand-rose border-2 border-brand-rose transition-all flex justify-center items-center gap-2 shadow-[0_10px_20px_rgba(167,0,42,0.2)]"
-                >
-                <ShoppingBag size={20} />
-                Pre-Order Now
-                </motion.button>
-                
-                <div className="mt-4 text-center">
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest flex items-center justify-center gap-1">
-                        <ShieldCheck size={12} /> Secured by PayHero
-                    </span>
-                </div>
-            </div>
-          </motion.div>
+            item={item} 
+            index={index} 
+            onBuy={handleBuyRequest} // Pass the handler down
+          />
         ))}
       </div>
 
-      {/* Payment Modal Integration */}
-      {selectedItem && (
+      {/* Payment Modal */}
+      {buyingItem && (
             <MpesaModal 
                 isOpen={isPaymentOpen} 
                 onClose={() => setIsPaymentOpen(false)}
-                total={selectedItem.price} 
+                total={buyingItem.price} 
                 onPaymentSuccess={(details) => {
                     setSuccessData({
                         details: details,
-                        item: selectedItem,
-                        size: selectedSize
+                        item: buyingItem,
+                        size: buyingSize
                     });
                     setIsPaymentOpen(false);
                     setView('receipt'); 
