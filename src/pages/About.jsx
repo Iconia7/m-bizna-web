@@ -4,7 +4,7 @@ import { Play, Trophy, Users, Target, Heart, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom'; 
 import picture from '../assets/pattern.png';
-import SEO from './components/SEO';
+import SEO from '../components/SEO';
 
 // Animation Variants
 const fadeInUp = {
