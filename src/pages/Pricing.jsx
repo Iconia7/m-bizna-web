@@ -7,7 +7,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase'; 
 import emailjs from '@emailjs/browser';
 import picture from '../assets/pattern.png';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/SEO';
 import { useRef } from 'react';
 import ReCAPTCHA from "react-google-recaptcha";
 import toast from 'react-hot-toast';
@@ -141,10 +141,11 @@ if (!token) {
 
   return (
     <div className="pt-20">
-        <Helmet>
-                <title>Pricing - Nexora Creative Solutions</title>
-                <meta name="description" content="Nexora Creative Solutions is a leading tech agency in Kenya specializing in Web Development, Mobile Apps, and Digital Marketing." />
-              </Helmet>
+        <SEO 
+  title="Pricing Packages | Affordable Web & App Development"
+  description="Transparent pricing for web design and software development in Kenya. Choose a package that fits your budget and business goals."
+  url="/pricing"
+/>
       
       {/* 1. Header Section */}
       <section className="relative py-24 text-center text-white overflow-hidden">

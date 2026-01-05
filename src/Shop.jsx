@@ -3,6 +3,7 @@ import { ShoppingBag, Clock, ShieldCheck, ArrowLeft, CheckCircle } from 'lucide-
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import MpesaModal from './MpesaModal';
+import SEO from './components/SEO';
 
 // --- INVENTORY DATA ---
 const MERCH = [
@@ -233,6 +234,11 @@ export default function Shop({ onBack }) {
 
   return (
     <>
+    <SEO 
+  title="Nexora Shop | Official Developer Merch"
+  description="Buy official Nexora Creative Solutions merchandise. High-quality 'Source Code' hoodies, tees, and developer gear. Delivery countrywide."
+  url="/shop"
+/>
       {view === 'receipt' && successData ? (
         <ReceiptView 
             transaction={successData.details}

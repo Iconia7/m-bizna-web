@@ -7,7 +7,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase'; 
 import emailjs from '@emailjs/browser';
 import picture from '../assets/pattern.png';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/SEO';
 import { useRef } from 'react';
 import ReCAPTCHA from "react-google-recaptcha";
 import toast from 'react-hot-toast';
@@ -99,10 +99,11 @@ if (!token) {
 
   return (
     <div className="pt-20">
-        <Helmet>
-                <title>Project Details - Nexora Creative Solutions</title>
-                <meta name="description" content="Nexora Creative Solutions is a leading tech agency in Kenya specializing in Web Development, Mobile Apps, and Digital Marketing." />
-              </Helmet>
+       <SEO 
+    title={`${project.title} | Project Case Study`}
+    description={`Discover how Nexora built ${project.title}. A successful project featuring ${project.techStack || "modern web technologies"}. View the full case study here.`}
+    url={`/projects/${project.id}`}
+  />
 
       {/* 1. Header Section */}
       <section className="relative py-24 text-center text-white overflow-hidden">

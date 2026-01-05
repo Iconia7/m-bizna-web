@@ -4,7 +4,7 @@ import { Play, Trophy, Users, Target, Heart, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom'; 
 import picture from '../assets/pattern.png';
-import { Helmet } from 'react-helmet-async';
+import SEO from './components/SEO';
 
 // Animation Variants
 const fadeInUp = {
@@ -28,10 +28,11 @@ const scaleUp = {
 const About = () => {
   return (
     <div className="pt-20 overflow-hidden">
-        <Helmet>
-                        <title>About Us - Nexora Creative Solutions</title>
-                        <meta name="description" content="Nexora Creative Solutions is a leading tech agency in Kenya specializing in Web Development, Mobile Apps, and Digital Marketing." />
-                      </Helmet>
+       <SEO 
+  title="About Us | Nexora Creative Solutions"
+  description="Meet the team behind Nexora. We are a group of passionate developers and creatives in Kiambu dedicated to transforming Kenyan businesses through technology."
+  url="/about"
+/>
       
       {/* 1. Header Section */}
       <section className="relative py-24 text-center text-white overflow-hidden">

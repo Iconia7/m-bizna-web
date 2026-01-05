@@ -2,15 +2,16 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Shield, Lock, Eye, FileText } from 'lucide-react';
 import picture from '../assets/pattern.png';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/SEO';
 
 const PrivacyPolicy = () => {
   return (
     <div className="pt-20">
-        <Helmet>
-                <title>Privacy Policy - Nexora Creative Solutions</title>
-                <meta name="description" content="Nexora Creative Solutions is a leading tech agency in Kenya specializing in Web Development, Mobile Apps, and Digital Marketing." />
-              </Helmet>
+        <SEO 
+  title="Privacy Policy | Nexora Creative Solutions"
+  description="We value your privacy. Read our policy to understand how Nexora Creative Solutions collects, uses, and protects your personal data."
+  url="/privacy"
+/>
       
       {/* Header */}
       <section className="relative py-20 text-center text-white overflow-hidden">

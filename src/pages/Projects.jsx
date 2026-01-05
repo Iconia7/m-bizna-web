@@ -8,7 +8,7 @@ import { db } from '../firebase';
 import emailjs from '@emailjs/browser';
 import picture from '../assets/pattern.png';
 import newton from '../assets/newton.jpeg';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/SEO';
 import { useRef } from 'react';
 import ReCAPTCHA from "react-google-recaptcha";
 import toast from 'react-hot-toast';
@@ -127,10 +127,11 @@ if (!token) {
 
   return (
     <div className="pt-20">
-        <Helmet>
-                <title>Projects - Nexora Creative Solutions</title>
-                <meta name="description" content="Nexora Creative Solutions is a leading tech agency in Kenya specializing in Web Development, Mobile Apps, and Digital Marketing." />
-              </Helmet>
+        <SEO 
+  title="Our Portfolio | Recent Projects by Nexora"
+  description="See our work in action. From e-commerce platforms to corporate websites and mobile apps, discover how we help businesses succeed online."
+  url="/projects"
+/>
       
       {/* 1. Header Section */}
       <section className="relative py-24 text-center text-white overflow-hidden">

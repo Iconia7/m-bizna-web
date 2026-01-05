@@ -2,15 +2,16 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle, AlertTriangle, Briefcase, DollarSign } from 'lucide-react';
 import picture from '../assets/pattern.png';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/SEO';
 
 const Terms = () => {
   return (
     <div className="pt-20">
-        <Helmet>
-                <title>Terms - Nexora Creative Solutions</title>
-                <meta name="description" content="Nexora Creative Solutions is a leading tech agency in Kenya specializing in Web Development, Mobile Apps, and Digital Marketing." />
-              </Helmet>
+        <SEO 
+  title="Terms of Service | Nexora Creative Solutions"
+  description="Read the Terms and Conditions for using Nexora Creative Solutions' website and services. Understanding our agreement ensures a smooth partnership."
+  url="/terms"
+/>
       
       {/* Header */}
       <section className="relative py-20 text-center text-white overflow-hidden">
