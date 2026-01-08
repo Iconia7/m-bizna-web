@@ -84,3 +84,37 @@ src/
 ├── data.js          # Static data for products/services
 └── App.jsx          # Main application entry
 ```
+
+## 💳 M-Pesa Integration Logic
+
+The payment flow works as follows:
+1. **User Trigger:** Customer clicks "Pay Now" in the Shop.
+2. **Backend Request:** `api/stkpush.js` hits the Safaricom Daraja API to trigger an STK Push to the user's phone.
+3. **User Action:** User enters their M-Pesa PIN.
+4. **Verification:** The frontend polls `api/query.js` every 3 seconds to check payment status.
+5. **Completion:** On success (`ResultCode: 0`), a receipt is generated and the order is finalized via WhatsApp.
+
+## 🤝 Contributing
+
+Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+## 📞 Contact
+
+**Newton Mwangi** - Founder & Lead Developer
+
+* **Email:** mwanginewton239@gmail.com
+* **Portfolio:** [nexoracreatives.co.ke](https://nexoracreatives.co.ke)
+* **LinkedIn:** [Newton Mwangi](https://linkedin.com/in/newton-mwangi)
+
+---
+*Built with ❤️ in Thika, Kenya by Nexora Creative Solutions.*
